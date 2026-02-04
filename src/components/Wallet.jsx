@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   Calculator, 
@@ -12,22 +12,28 @@ import { paymentMethods, cryptoPayments } from '../data.js'
 import Header from './ui/Header'
 import LiquidGlassButton from './ui/LiquidGlassButton'
 import SupportSection from './ui/SupportSection'
-import DepositModal from './modals/DepositModal'
+import TopUpModal from './modals/TopUpModal'
 import WithdrawModal from './modals/WithdrawModal'
 import CalculatorModal from './modals/CalculatorModal'
-
-const transactionHistory = [
-  { id: 1, type: 'deposit', amount: 5000, status: 'completed', date: '28.01.2026', time: '14:23' },
-  { id: 2, type: 'withdraw', amount: -2500, status: 'pending', date: '27.01.2026', time: '18:45' },
-  { id: 3, type: 'deposit', amount: 10000, status: 'completed', date: '26.01.2026', time: '09:12' },
-]
+import { useApp } from '../context/AppContext'
 
 export default function Wallet() {
+  const { user, getUserTransactions } = useApp()
   const [showDepositModal, setShowDepositModal] = useState(false)
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
   const [showCalculatorModal, setShowCalculatorModal] = useState(false)
   const [activeTab, setActiveTab] = useState('all')
-  const balance = 12500
+  const [transactionHistory, setTransactionHistory] = useState([])
+  const balance = user?.balance || 0
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      const txType = activeTab === 'deposits' ? 'deposit' : activeTab === 'withdrawals' ? 'withdraw' : null
+      const data = await getUserTransactions(txType)
+      setTransactionHistory(data || [])
+    }
+    fetchTransactions()
+  }, [getUserTransactions, activeTab])
 
   const tabs = [
     { id: 'all', label: 'Все' },
@@ -208,10 +214,10 @@ export default function Wallet() {
                   </div>
                   <div>
                     <p className="text-sm font-medium">
-                      {tx.type === 'deposit' ? 'Пополнение' : 'Вывод'}
+                      {tx.type === 'deposit' ? 'Пополнение' : tx.type === 'withdraw' ? 'Вывод' : tx.type === 'profit' ? 'Прибыль' : tx.type}
                     </p>
                     <p className="text-xs text-[var(--color-text-sub)]">
-                      {tx.date} в {tx.time}
+                      {tx.created_at ? new Date(tx.created_at).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
                     </p>
                   </div>
                 </div>
@@ -242,7 +248,7 @@ export default function Wallet() {
       <SupportSection />
 
       {/* Modals */}
-      <DepositModal 
+      <TopUpModal 
         isOpen={showDepositModal} 
         onClose={() => setShowDepositModal(false)} 
       />

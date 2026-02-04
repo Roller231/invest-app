@@ -47,20 +47,6 @@ export default function SupportSection({ showTransferButton = true }) {
 
       <CryptoIcons />
 
-      {showTransferButton && (
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="flex w-full items-center justify-between rounded-2xl bg-[var(--color-bg-card)] p-4"
-        >
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">💳</span>
-            <span className="font-medium">Переводы на карту</span>
-          </div>
-          <span className="text-[var(--color-text-sub)]">→</span>
-        </motion.button>
-      )}
-
       <p className="text-center text-xs text-[var(--color-text-sub)]">
         © 2026 BINANCE. Все права защищены.
       </p>

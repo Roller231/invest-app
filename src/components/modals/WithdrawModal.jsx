@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { CheckCircle, Wallet } from 'lucide-react'
 import Modal from '../ui/Modal'
 import LiquidGlassButton from '../ui/LiquidGlassButton'
+import { useApp } from '../../context/AppContext'
 
 const banks = [
   { id: 'sber', label: 'Сбербанк', color: '#21A038' },
@@ -14,11 +15,14 @@ const banks = [
 ]
 
 export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
+  const { createWithdraw } = useApp()
   const [selectedBank, setSelectedBank] = useState(null)
   const [amount, setAmount] = useState('')
   const [phone, setPhone] = useState('+7')
   const [cardNumber, setCardNumber] = useState('')
   const [step, setStep] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   const formatPhone = (value) => {
     const digits = value.replace(/\D/g, '')
@@ -34,8 +38,21 @@ export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
     return digits.replace(/(.{4})/g, '$1 ').trim().slice(0, 19)
   }
 
-  const handleSubmit = () => {
-    setStep(2)
+  const handleSubmit = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const withdrawAmount = parseFloat(amount)
+      if (withdrawAmount > balance) {
+        throw new Error('Недостаточно средств')
+      }
+      await createWithdraw(withdrawAmount)
+      setStep(2)
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleClose = () => {
@@ -129,14 +146,20 @@ export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
             />
           </div>
 
+          {error && (
+            <div className="rounded-2xl bg-[var(--color-red)]/10 p-3 text-center">
+              <p className="text-sm text-[var(--color-red)]">{error}</p>
+            </div>
+          )}
+
           <LiquidGlassButton
             variant="primary"
             fullWidth
             size="lg"
             onClick={handleSubmit}
-            disabled={!selectedBank || !amount || !cardNumber}
+            disabled={!selectedBank || !amount || !cardNumber || loading}
           >
-            Готово
+            {loading ? 'Обработка...' : 'Готово'}
           </LiquidGlassButton>
         </div>
       ) : (

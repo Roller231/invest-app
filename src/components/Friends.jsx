@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   Share2, 
@@ -10,25 +10,36 @@ import {
   CheckCircle,
   Clock
 } from 'lucide-react'
-import { referralLevels, userStats } from '../data.js'
+import { referralLevels } from '../data.js'
 import Header from './ui/Header'
 import LiquidGlassButton from './ui/LiquidGlassButton'
 import SupportSection from './ui/SupportSection'
+import { useApp } from '../context/AppContext'
 
 export default function Friends() {
+  const { user, getReferralStats } = useApp()
   const [copied, setCopied] = useState(false)
+  const [refStats, setRefStats] = useState(null)
   const totalUsers = 61094
 
+  useEffect(() => {
+    const fetchStats = async () => {
+      const data = await getReferralStats()
+      if (data) setRefStats(data)
+    }
+    fetchStats()
+  }, [getReferralStats])
+
   const stats = {
-    partners: 0,
-    earned: 0,
-    activePartners: 0,
-    level1Partners: 0,
-    level23Partners: 0,
-    totalDeposited: 0,
+    partners: refStats?.total_partners || 0,
+    earned: refStats?.total_earned || 0,
+    activePartners: refStats?.active_partners || 0,
+    level1Partners: refStats?.level1_partners || 0,
+    level23Partners: refStats?.level23_partners || 0,
+    totalDeposited: refStats?.total_deposited_by_referrals || 0,
   }
 
-  const referralLink = 'https://t.me/BinanceP2Pbot?start=1131199469'
+  const referralLink = refStats?.referral_link || user?.referral_link || `https://t.me/ggcat_game_bot?start=${user?.tg_id || ''}`
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink)
@@ -50,7 +61,7 @@ export default function Friends() {
 
   return (
     <div className="space-y-6">
-      <Header balance={0} />
+      <Header balance={user?.balance || 0} />
 
       {/* Main Referral Block */}
       <motion.section

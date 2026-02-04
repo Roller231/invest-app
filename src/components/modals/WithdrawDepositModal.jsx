@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Wallet, MessageCircle, CheckCircle, AlertTriangle } from 'lucide-react'
 import Modal from '../ui/Modal'
 import LiquidGlassButton from '../ui/LiquidGlassButton'
+import { useApp } from '../../context/AppContext'
+import { useToast } from '../ui/ToastProvider.jsx'
 
 const steps = [
   {
@@ -21,8 +24,28 @@ const steps = [
   },
 ]
 
-export default function WithdrawDepositModal({ isOpen, onClose, depositAmount = 0 }) {
+export default function WithdrawDepositModal({ isOpen, onClose }) {
+  const { stats, withdrawDeposit } = useApp()
+  const toast = useToast()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  
+  const depositAmount = stats?.total_deposit || 0
   const isEligible = depositAmount >= 100000
+
+  const handleWithdrawDeposit = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      await withdrawDeposit()
+      toast.success('Заявка создана', 'Вывод депозита')
+      onClose()
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Вывод вклада">
@@ -116,17 +139,21 @@ export default function WithdrawDepositModal({ isOpen, onClose, depositAmount = 
           </div>
         </div>
 
+        {error && (
+          <div className="rounded-2xl bg-[var(--color-red)]/10 p-3 text-center">
+            <p className="text-sm text-[var(--color-red)]">{error}</p>
+          </div>
+        )}
+
         <LiquidGlassButton
           variant={isEligible ? 'primary' : 'secondary'}
           fullWidth
           size="lg"
           icon={MessageCircle}
-          onClick={() => {
-            window.open('https://t.me/support', '_blank')
-            onClose()
-          }}
+          disabled={!isEligible || loading}
+          onClick={handleWithdrawDeposit}
         >
-          Написать менеджеру
+          {loading ? 'Обработка...' : 'Запросить вывод депозита'}
         </LiquidGlassButton>
       </div>
     </Modal>
