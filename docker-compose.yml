@@ -4,6 +4,7 @@ services:
   mysql:
     image: mysql:8.0
     container_name: invest-mysql
+    hostname: mysql
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: invest_app
@@ -21,7 +22,9 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - invest_net
+      invest_net:
+        aliases:
+          - mysql
 
   backend:
     build:

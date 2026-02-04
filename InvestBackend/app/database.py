@@ -2,6 +2,8 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import create_engine
 import pymysql
+import asyncio
+from sqlalchemy.exc import OperationalError
 from app.config import settings
 
 
@@ -54,6 +56,14 @@ def create_database_if_not_exists():
 async def init_db():
     """Initialize database and create all tables"""
     from app.models import User, Tariff, Deposit, Transaction, Referral, FakeName, PromoCode, PromoRedemption
+
+    # Wait for DB to be reachable (docker / cold start)
+    for _ in range(30):
+        try:
+            async with async_engine.connect():
+                break
+        except OperationalError:
+            await asyncio.sleep(1)
     
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
