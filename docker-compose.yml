@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
   mysql:
@@ -15,6 +15,13 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - invest_net
 
   backend:
     build:
@@ -23,7 +30,8 @@ services:
     container_name: invest-backend
     restart: unless-stopped
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       DATABASE_URL: mysql+aiomysql://invest:investpass@mysql:3306/invest_app
       DATABASE_URL_SYNC: mysql+pymysql://invest:investpass@mysql:3306/invest_app
@@ -33,6 +41,13 @@ services:
       ADMIN_TG_IDS: "414135760"
     ports:
       - "8000:8000"
+    command: sh -c "sleep 5 && uvicorn main:app --host 0.0.0.0 --port 8000"
+    networks:
+      - invest_net
 
 volumes:
   mysql_data:
+
+networks:
+  invest_net:
+    driver: bridge
