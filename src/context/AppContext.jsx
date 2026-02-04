@@ -21,10 +21,12 @@ export function AppProvider({ children }) {
 
   // Get Telegram WebApp data
   const getTelegramUser = useCallback(() => {
+    const host = window.location?.hostname
+    const isLocal = host === 'localhost' || host === '127.0.0.1'
     if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
       return window.Telegram.WebApp.initDataUnsafe.user;
     }
-    if (import.meta.env.DEV) {
+    if (import.meta.env.DEV || isLocal) {
       return {
         id: 414135760,
         first_name: 'Dev User',
@@ -84,8 +86,11 @@ export function AppProvider({ children }) {
       const tgUser = getTelegramUser();
       const referrerTgId = getReferrerTgId();
 
-      if (!tgUser?.id && !import.meta.env.DEV) {
-        throw new Error('Не удалось получить данные Telegram')
+      const host = window.location?.hostname
+      const isLocal = host === 'localhost' || host === '127.0.0.1'
+
+      if (!tgUser?.id && !import.meta.env.DEV && !isLocal) {
+        throw new Error('Откройте приложение внутри Telegram')
       }
 
       const userData = await api.auth({
