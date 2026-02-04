@@ -158,7 +158,11 @@ export default function Exchange() {
 
   return (
     <div className="space-y-4">
-      <Header balance={balance} />
+      <Header
+        balance={balance}
+        avatarUrl={user?.avatar_url}
+        avatarName={user?.first_name || user?.username || 'U'}
+      />
 
       <section className="card-surface p-4 space-y-4">
         <div className="flex items-center justify-between">

@@ -11,6 +11,15 @@ class UserCreate(BaseModel):
     referrer_tg_id: Optional[int] = None
 
 
+class UserAuthRequest(BaseModel):
+    init_data: Optional[str] = None
+    referrer_tg_id: Optional[int] = None
+    tg_id: Optional[int] = None
+    username: Optional[str] = None
+    first_name: Optional[str] = None
+    avatar_url: Optional[str] = None
+
+
 class UserUpdate(BaseModel):
     username: Optional[str] = None
     first_name: Optional[str] = None

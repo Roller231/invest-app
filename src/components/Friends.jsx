@@ -61,7 +61,11 @@ export default function Friends() {
 
   return (
     <div className="space-y-6">
-      <Header balance={user?.balance || 0} />
+      <Header
+        balance={user?.balance || 0}
+        avatarUrl={user?.avatar_url}
+        avatarName={user?.first_name || user?.username || 'U'}
+      />
 
       {/* Main Referral Block */}
       <motion.section

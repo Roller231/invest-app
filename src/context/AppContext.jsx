@@ -24,14 +24,41 @@ export function AppProvider({ children }) {
     if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
       return window.Telegram.WebApp.initDataUnsafe.user;
     }
-    // Fallback for development
-    return {
-      id: 414135760,
-      first_name: 'Dev User',
-      username: 'devuser',
-      photo_url: null,
-    };
+    if (import.meta.env.DEV) {
+      return {
+        id: 414135760,
+        first_name: 'Dev User',
+        username: 'devuser',
+        photo_url: null,
+      };
+    }
+    return null;
   }, []);
+
+  const initTelegram = useCallback(() => {
+    const tg = window.Telegram?.WebApp
+    if (!tg) return null
+
+    try {
+      tg.ready()
+    } catch (e) {
+      // ignore
+    }
+
+    try {
+      tg.expand()
+    } catch (e) {
+      // ignore
+    }
+
+    try {
+      tg.requestFullscreen?.()
+    } catch (e) {
+      // ignore
+    }
+
+    return tg
+  }, [])
 
   // Extract referrer from start param
   const getReferrerTgId = useCallback(() => {
@@ -51,24 +78,33 @@ export function AppProvider({ children }) {
       setLoading(true);
       setError(null);
 
+      const tg = initTelegram()
+      const initData = tg?.initData || ''
+
       const tgUser = getTelegramUser();
       const referrerTgId = getReferrerTgId();
 
+      if (!tgUser?.id && !import.meta.env.DEV) {
+        throw new Error('Не удалось получить данные Telegram')
+      }
+
       const userData = await api.auth({
-        tg_id: tgUser.id,
-        username: tgUser.username,
-        first_name: tgUser.first_name,
-        avatar_url: tgUser.photo_url,
+        init_data: initData,
+        tg_id: tgUser?.id,
+        username: tgUser?.username,
+        first_name: tgUser?.first_name,
+        avatar_url: tgUser?.photo_url,
         referrer_tg_id: referrerTgId,
       });
 
       setUser(userData);
 
       // Load stats, tariffs, and deposits
+      const tgId = userData?.tg_id || tgUser?.id
       const [statsData, tariffsData, depositsData] = await Promise.all([
-        api.getUserStats(tgUser.id),
+        api.getUserStats(tgId),
         api.getTariffs(),
-        api.getUserDeposits(tgUser.id),
+        api.getUserDeposits(tgId),
       ]);
 
       setStats(statsData);

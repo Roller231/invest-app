@@ -43,6 +43,8 @@ export default function Dashboard() {
     <div className="space-y-6">
       <Header 
         balance={user?.balance || 0} 
+        avatarUrl={user?.avatar_url}
+        avatarName={user?.first_name || user?.username || 'U'}
         onDeposit={() => setShowTopUpModal(true)} 
       />
 

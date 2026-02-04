@@ -91,9 +91,11 @@ export default function Profile() {
 
   return (
     <div className="space-y-6">
-      <Header 
-        balance={user?.balance || 0} 
-        onDeposit={() => setShowDepositModal(true)} 
+      <Header
+        balance={user?.balance || 0}
+        avatarUrl={user?.avatar_url}
+        avatarName={user?.first_name || user?.username || 'U'}
+        onDeposit={() => setShowDepositModal(true)}
       />
 
       {/* Active Deposit Card - only show if there's an active deposit */}

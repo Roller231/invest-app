@@ -3,18 +3,43 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.database import get_db
-from app.schemas.user import UserCreate, UserUpdate, UserResponse, UserStats
+from app.schemas.user import UserCreate, UserAuthRequest, UserUpdate, UserResponse, UserStats
 from app.services.user_service import UserService
 from app.models import Deposit
+from app.utils.telegram import extract_user_from_init_data
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.post("/auth", response_model=UserResponse)
-async def auth_user(data: UserCreate, db: AsyncSession = Depends(get_db)):
+async def auth_user(data: UserAuthRequest, db: AsyncSession = Depends(get_db)):
     """Authenticate or register user from Telegram Mini App"""
     service = UserService(db)
-    user, is_new = await service.get_or_create(data)
+
+    tg_user = None
+    if data.init_data:
+        tg_user = extract_user_from_init_data(data.init_data)
+
+    if tg_user and tg_user.get("id"):
+        create_data = UserCreate(
+            tg_id=int(tg_user.get("id")),
+            username=tg_user.get("username"),
+            first_name=tg_user.get("first_name"),
+            avatar_url=tg_user.get("photo_url"),
+            referrer_tg_id=data.referrer_tg_id,
+        )
+    else:
+        if not data.tg_id:
+            raise HTTPException(status_code=400, detail="tg_id обязателен")
+        create_data = UserCreate(
+            tg_id=int(data.tg_id),
+            username=data.username,
+            first_name=data.first_name,
+            avatar_url=data.avatar_url,
+            referrer_tg_id=data.referrer_tg_id,
+        )
+
+    user, _is_new = await service.get_or_create(create_data)
     return user
 
 

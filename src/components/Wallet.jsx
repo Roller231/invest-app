@@ -52,6 +52,8 @@ export default function Wallet() {
     <div className="space-y-6">
       <Header 
         balance={balance} 
+        avatarUrl={user?.avatar_url}
+        avatarName={user?.first_name || user?.username || 'U'}
         onDeposit={() => setShowDepositModal(true)} 
       />
 

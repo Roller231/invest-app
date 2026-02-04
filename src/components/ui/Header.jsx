@@ -5,12 +5,15 @@ import TopUpModal from '../modals/TopUpModal'
 
 export default function Header({ 
   balance = 0, 
+  avatarUrl,
+  avatarName = 'U',
   showBack = false, 
   onBack,
   onDeposit,
   showMenu = true 
 }) {
   const [showTopUpModal, setShowTopUpModal] = useState(false)
+  const [avatarFailed, setAvatarFailed] = useState(false)
 
   const handleDeposit = onDeposit || (() => setShowTopUpModal(true))
 
@@ -72,9 +75,18 @@ export default function Header({
           </motion.button>
 
           <div className="h-10 w-10 rounded-full bg-gradient-to-br from-red-500 to-red-700 overflow-hidden">
-            <div className="h-full w-full flex items-center justify-center text-white font-semibold">
-              U
-            </div>
+            {avatarUrl && !avatarFailed ? (
+              <img
+                src={avatarUrl}
+                alt="avatar"
+                className="h-full w-full object-cover"
+                onError={() => setAvatarFailed(true)}
+              />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center text-white font-semibold">
+                {(avatarName || 'U').charAt(0).toUpperCase()}
+              </div>
+            )}
           </div>
         </div>
       </motion.header>

@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: invest-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: invest_app
+      MYSQL_USER: invest
+      MYSQL_PASSWORD: investpass
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+
+  backend:
+    build:
+      context: ./InvestBackend
+      dockerfile: Dockerfile
+    container_name: invest-backend
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_URL: mysql+aiomysql://invest:investpass@mysql:3306/invest_app
+      DATABASE_URL_SYNC: mysql+pymysql://invest:investpass@mysql:3306/invest_app
+      SECRET_KEY: super-secret-key-change-in-production
+      BOT_TOKEN: ""
+      BOT_USERNAME: ggcat_game_bot
+      ADMIN_TG_IDS: "414135760"
+    ports:
+      - "8000:8000"
+
+volumes:
+  mysql_data:
