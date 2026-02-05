@@ -133,7 +133,7 @@ export default function TradingSimulationModal({ isOpen, onClose, tariff, deposi
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Торговый терминал" fullScreen topOffset={75}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Торговый терминал" fullScreen topOffset={95}>
       <div className="space-y-4">
         {/* Tariff Info */}
         <div className="rounded-2xl bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent p-4">
