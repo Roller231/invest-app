@@ -397,7 +397,7 @@ export default function Profile() {
             const isUp = asset.trend === 'up'
             const lineColor = isUp ? 'var(--color-green)' : 'var(--color-red)'
             // Static chart path - same for all cards (matches reference: sharp rise, jagged peaks, then drop + flatter tail)
-            const staticPath = 'M 0 52 L 6 40 L 12 34 L 18 38 L 24 30 L 30 44 L 36 26 L 42 34 L 48 48 L 54 42 L 60 50 L 66 46 L 72 52 L 78 49 L 84 53 L 90 51 L 96 54 L 100 53'
+            const staticPath = 'M 0 52 L 2 50 L 4 48 L 6 46 L 8 44 L 10 41 L 12 38 L 14 36 L 16 34 L 18 35 L 20 36 L 22 34 L 24 32 L 26 34 L 28 36 L 30 39 L 32 42 L 34 38 L 36 34 L 38 31 L 40 28 L 42 30 L 44 32 L 46 36 L 48 40 L 50 44 L 52 48 L 54 46 L 56 44 L 58 45 L 60 46 L 62 48 L 64 50 L 66 49 L 68 47 L 70 49 L 72 52 L 74 51 L 76 50 L 78 52 L 80 53 L 82 52 L 84 51 L 86 53 L 88 54 L 90 53 L 92 52 L 94 54 L 96 55 L 98 54 L 100 53'
             
             return (
               <motion.div
