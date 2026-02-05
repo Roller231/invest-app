@@ -76,7 +76,7 @@ export function ToastProvider({ children }) {
     <ToastContext.Provider value={api}>
       {children}
       <div className="pointer-events-none fixed inset-x-0 top-0 z-[10000]">
-        <div className="mx-auto w-full max-w-md px-4 pt-[80px]">
+        <div className="mx-auto w-full max-w-md px-4 pt-[95px]">
           <AnimatePresence initial={false}>
             {toasts.map((t) => {
               const cls = tone(t.type)
