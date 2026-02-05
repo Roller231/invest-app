@@ -432,7 +432,7 @@ export default function Profile() {
                     <img 
                       src={asset.icon || `https://cryptologos.cc/logos/${asset.name.toLowerCase()}-${asset.symbol.toLowerCase()}-logo.png`}
                       alt={asset.symbol}
-                      className="h-8 w-8 rounded-full"
+                      className={`rounded-full ${(asset.id === 'eth' || asset.id === 'sol') ? 'h-9 w-9' : 'h-8 w-8'}`}
                       onError={(e) => {
                         e.target.onerror = null
                         e.target.src = `https://ui-avatars.com/api/?name=${asset.symbol}&background=${asset.color?.replace('#', '')}&color=fff&size=32`

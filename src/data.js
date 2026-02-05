@@ -1,3 +1,7 @@
+import solanaIcon from './assets/crypto-icons/SOLANA.png'
+import ethIcon from './assets/crypto-icons/ETH.png'
+import usdtIcon from './assets/crypto-icons/usdt.png'
+
 export const carouselSlides = [
   {
     title: 'Промокод - NG2026',
@@ -79,11 +83,11 @@ export const cryptoPayments = [
 ]
 
 export const marketTrends = [
-  { id: 'sol', name: 'Solana', symbol: 'SOL', price: 9344.80, change: 7.28, trend: 'down', color: '#9945FF', icon: 'https://cryptologos.cc/logos/solana-sol-logo.png' },
+  { id: 'sol', name: 'Solana', symbol: 'SOL', price: 9344.80, change: 7.28, trend: 'down', color: '#9945FF', icon: solanaIcon },
   { id: 'btc', name: 'Bitcoin', symbol: 'BTC', price: 6720080, change: 6.28, trend: 'down', color: '#F7931A', icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png' },
   { id: 'bnb', name: 'BNB', symbol: 'BNB', price: 54110, change: 2.4, trend: 'up', color: '#F3BA2F', icon: 'https://cryptologos.cc/logos/bnb-bnb-logo.png' },
-  { id: 'usdt', name: 'Tether', symbol: 'USDT', price: 92.5, change: 0.01, trend: 'up', color: '#26A17B', icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png' },
-  { id: 'eth', name: 'Ethereum', symbol: 'ETH', price: 287500, change: 3.5, trend: 'down', color: '#627EEA', icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
+  { id: 'usdt', name: 'Tether', symbol: 'USDT', price: 92.5, change: 0.01, trend: 'up', color: '#26A17B', icon: usdtIcon },
+  { id: 'eth', name: 'Ethereum', symbol: 'ETH', price: 287500, change: 3.5, trend: 'down', color: '#627EEA', icon: ethIcon },
   { id: 'ton', name: 'Toncoin', symbol: 'TON', price: 520, change: 5.2, trend: 'up', color: '#0098EA', icon: 'https://cryptologos.cc/logos/toncoin-ton-logo.png' },
 ]
 
