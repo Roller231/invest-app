@@ -15,7 +15,7 @@ const banks = [
 ]
 
 export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
-  const { createWithdraw } = useApp()
+  const { createWithdraw, formatAmount } = useApp()
   const [selectedBank, setSelectedBank] = useState(null)
   const [amount, setAmount] = useState('')
   const [phone, setPhone] = useState('+7')
@@ -72,7 +72,7 @@ export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
           <div className="rounded-2xl bg-[var(--color-bg-base)] p-4 text-center">
             <p className="text-sm text-[var(--color-text-sub)]">Доступно для вывода</p>
             <p className="text-2xl font-bold text-[var(--color-primary)]">
-              {balance.toLocaleString()} ₽
+              {formatAmount(balance, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}
             </p>
           </div>
 
@@ -179,7 +179,7 @@ export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
           <div>
             <h3 className="text-xl font-bold">Успешно!</h3>
             <p className="mt-2 text-sm text-[var(--color-text-sub)]">
-              Запрос на вывод {parseInt(amount).toLocaleString()} ₽ создан
+              Запрос на вывод {formatAmount(parseInt(amount) || 0, { maximumFractionDigits: 0, minimumFractionDigits: 0 })} создан
             </p>
           </div>
 

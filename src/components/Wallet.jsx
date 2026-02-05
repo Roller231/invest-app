@@ -21,7 +21,7 @@ const tariffs = [
 ]
 
 export default function Wallet() {
-  const { user, getUserTransactions } = useApp()
+  const { user, getUserTransactions, formatAmount } = useApp()
   const [showDepositModal, setShowDepositModal] = useState(false)
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
   const [activeTab, setActiveTab] = useState('all')
@@ -80,18 +80,15 @@ export default function Wallet() {
         animate={{ opacity: 1, y: 0 }}
         className="card-surface overflow-hidden"
       >
-        <div className="bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent p-5">
+        <div className="bg-gradient-to-b from-[var(--color-primary)]/15 via-transparent to-transparent p-5 pb-3">
           <p className="text-sm text-[var(--color-text-sub)]">Баланс кошелька</p>
           <motion.p 
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             className="mt-2 text-center text-4xl font-bold"
           >
-            {balance.toLocaleString()} <span className="text-xl">₽</span>
+            {formatAmount(balance, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}
           </motion.p>
-          <p className="mt-1 text-center text-sm text-[var(--color-text-sub)]">
-            ≈ {(balance / 92.5).toFixed(2)} USDT
-          </p>
         </div>
         
         <div className="flex gap-3 p-4">
@@ -159,18 +156,18 @@ export default function Wallet() {
 
           <div>
             <p className="mb-2 text-sm font-medium text-[var(--color-text-sub)]">
-              Сумма вложения (мин. {tariff?.min?.toLocaleString()} ₽)
+              Сумма вложения (мин. {formatAmount(tariff?.min || 0, { maximumFractionDigits: 0, minimumFractionDigits: 0 })})
             </p>
             <input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               min={tariff?.min}
-              placeholder={tariff?.min ? `От ${tariff.min.toLocaleString()} ₽` : 'Сумма'}
+              placeholder={tariff?.min ? `От ${formatAmount(tariff.min, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}` : 'Сумма'}
               className="h-14 w-full rounded-2xl bg-[var(--color-bg-base)] px-4 text-xl font-bold outline-none ring-1 ring-white/10 focus:ring-[var(--color-primary)]"
             />
             <p className="mt-2 text-xs text-[var(--color-text-sub)]">
-              Диапазон: {tariff?.min?.toLocaleString()} ₽ — {tariff?.max?.toLocaleString()} ₽
+              Диапазон: {formatAmount(tariff?.min || 0, { maximumFractionDigits: 0, minimumFractionDigits: 0 })} — {formatAmount(tariff?.max || 0, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
             </p>
           </div>
 
@@ -179,18 +176,18 @@ export default function Wallet() {
 
             <div className="flex items-center justify-between rounded-2xl bg-[var(--color-bg-base)] p-4">
               <span className="text-sm text-[var(--color-text-sub)]">За 24 часа</span>
-              <span className="text-lg font-bold text-[var(--color-green)]">+{calculations.daily.toFixed(2)} ₽</span>
+              <span className="text-lg font-bold text-[var(--color-green)]">+{formatAmount(calculations.daily, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</span>
             </div>
 
             <div className="flex items-center justify-between rounded-2xl bg-[var(--color-bg-base)] p-4">
               <span className="text-sm text-[var(--color-text-sub)]">За месяц</span>
-              <span className="text-lg font-bold text-[var(--color-primary)]">+{calculations.monthly.toFixed(2)} ₽</span>
+              <span className="text-lg font-bold text-[var(--color-primary)]">+{formatAmount(calculations.monthly, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</span>
             </div>
 
             <div className="flex items-center justify-between rounded-2xl bg-gradient-to-r from-[var(--color-primary)]/20 to-transparent p-4">
               <span className="text-sm font-medium">За год</span>
               <span className="text-xl font-bold text-[var(--color-primary)]">
-                +{calculations.yearly.toLocaleString(undefined, { maximumFractionDigits: 0 })} ₽
+                +{formatAmount(calculations.yearly, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
               </span>
             </div>
           </div>
@@ -211,7 +208,7 @@ export default function Wallet() {
         <div>
           <p className="text-sm font-medium">Пополните депозит</p>
           <p className="text-xs text-[var(--color-text-sub)]">
-            Минимальная сумма пополнения — 100 ₽. Бонус +10% при депозите от 50 000 ₽
+            Минимальная сумма пополнения — {formatAmount(100, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}. Бонус +10% при депозите от {formatAmount(50000, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
           </p>
         </div>
       </motion.div>
@@ -276,7 +273,7 @@ export default function Wallet() {
                   <p className={`font-semibold ${
                     tx.amount > 0 ? 'text-[var(--color-green)]' : 'text-[var(--color-red)]'
                   }`}>
-                    {tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString()} ₽
+                    {tx.amount > 0 ? '+' : '-'}{formatAmount(Math.abs(tx.amount), { maximumFractionDigits: 2, minimumFractionDigits: 0 })}
                   </p>
                   <p className={`text-xs ${
                     tx.status === 'completed' ? 'text-[var(--color-green)]' : 'text-[var(--color-primary)]'

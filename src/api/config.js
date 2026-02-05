@@ -24,6 +24,8 @@ export const endpoints = {
   liveTransactions: '/transactions/live',
   userTransactions: (tgId) => `/transactions/${tgId}`,
   withdraw: (tgId) => `/transactions/${tgId}/withdraw`,
+  gameBet: (tgId) => `/transactions/${tgId}/game/bet`,
+  gamePayout: (tgId) => `/transactions/${tgId}/game/payout`,
   
   // Referrals
   referrals: (tgId) => `/referrals/${tgId}`,

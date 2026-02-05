@@ -12,6 +12,7 @@ import LiquidGlassButton from './ui/LiquidGlassButton'
 import SupportSection from './ui/SupportSection'
 import BannerCarousel from './ui/BannerCarousel'
 import TopUpModal from './modals/TopUpModal'
+import Modal from './ui/Modal'
 import { useApp } from '../context/AppContext'
 import { useToast } from './ui/ToastProvider.jsx'
 
@@ -22,9 +23,10 @@ const toneStyles = {
 }
 
 export default function Dashboard() {
-  const { user, tariffs, liveTransactions, topStrip, activatePromo } = useApp()
+  const { user, tariffs, liveTransactions, topStrip, activatePromo, formatAmount } = useApp()
   const toast = useToast()
   const [showTopUpModal, setShowTopUpModal] = useState(false)
+  const [showTariffInfo, setShowTariffInfo] = useState(false)
   const [promoCode, setPromoCode] = useState('')
   const [stripPulseKey, setStripPulseKey] = useState(0)
   const [promoLoading, setPromoLoading] = useState(false)
@@ -80,7 +82,7 @@ export default function Dashboard() {
                   animate={{ scale: [1, 1.08, 1] }}
                   transition={{ duration: 0.45, ease: 'easeOut' }}
                 >
-                  ({user.balance.toLocaleString()}₽)
+                  ({formatAmount(user.balance, { maximumFractionDigits: 0, minimumFractionDigits: 0 })})
                 </motion.span>
               </motion.div>
             ))}
@@ -93,9 +95,9 @@ export default function Dashboard() {
 
       {/* Live Transactions */}
       <section className="space-y-3">
-        <div className="flex items-center gap-2 text-sm font-semibold">
-          <Wifi className="h-4 w-4 text-[var(--color-primary)]" />
-          Live транзакции:
+        <div className="flex items-center gap-2 text-base font-semibold">
+          <Wifi className="h-5 w-5 text-[var(--color-primary)]" />
+          Live транзакции
         </div>
         <div className="space-y-2">
           <AnimatePresence initial={false} mode="popLayout">
@@ -130,7 +132,7 @@ export default function Dashboard() {
                   <p className={`text-sm font-semibold ${
                     tx.amount > 0 ? 'text-[var(--color-green)]' : 'text-[var(--color-red)]'
                   }`}>
-                    {tx.amount > 0 ? '+' : ''}{tx.amount} ₽
+                    {tx.amount > 0 ? '+' : ''}{formatAmount(Math.abs(tx.amount), { maximumFractionDigits: 2, minimumFractionDigits: 0 })}
                   </p>
                   <p className="text-xs text-sub">{tx.time}</p>
                 </div>
@@ -143,11 +145,11 @@ export default function Dashboard() {
       {/* Tariffs */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <Gift className="h-4 w-4 text-[var(--color-primary)]" />
+          <div className="flex items-center gap-2 text-base font-semibold">
+            <Gift className="h-5 w-5 text-[var(--color-primary)]" />
             Тарифы компании
           </div>
-          <button type="button" className="text-xs text-sub">
+          <button type="button" className="text-xs text-sub" onClick={() => setShowTariffInfo(true)}>
             Подробнее <ChevronRight className="inline h-3 w-3" />
           </button>
         </div>
@@ -179,7 +181,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <p className="mt-3 text-xs text-sub">
-                от {tariff.min_amount?.toLocaleString()} ₽ до {tariff.max_amount?.toLocaleString()} ₽
+                от {formatAmount(tariff.min_amount, { maximumFractionDigits: 0, minimumFractionDigits: 0 })} до {formatAmount(tariff.max_amount, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
               </p>
             </motion.div>
           ))}
@@ -215,7 +217,7 @@ export default function Dashboard() {
               setPromoLoading(true)
               try {
                 const res = await activatePromo(promoCode)
-                toast.success(`Начислено +${res?.amount || 0}₽`, res?.message || 'Промокод активирован')
+                toast.success(`Начислено +${formatAmount(res?.amount || 0, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}`, res?.message || 'Промокод активирован')
                 setPromoCode('')
               } catch (e) {
                 toast.error(e.message, 'Ошибка')
@@ -231,6 +233,35 @@ export default function Dashboard() {
 
       {/* Support Section */}
       <SupportSection />
+
+      <Modal
+        isOpen={showTariffInfo}
+        onClose={() => setShowTariffInfo(false)}
+        title="Как работают тарифы"
+      >
+        <div className="space-y-3 text-sm text-[var(--color-text-main)]">
+          <div className="card-surface p-4">
+            <p className="font-semibold">Вклады</p>
+            <p className="mt-1 text-sub">
+              Ты выбираешь тариф и сумму депозита. Депозит начинает работать сразу после создания.
+            </p>
+          </div>
+
+          <div className="card-surface p-4">
+            <p className="font-semibold">Начисления</p>
+            <p className="mt-1 text-sub">
+              Доход начисляется каждые 24 часа по проценту тарифа. Накопления можно собирать на баланс или реинвестировать.
+            </p>
+          </div>
+
+          <div className="card-surface p-4">
+            <p className="font-semibold">Вывод</p>
+            <p className="mt-1 text-sub">
+              В любой момент можно вывести вклад. Операции отображаются в разделе транзакций.
+            </p>
+          </div>
+        </div>
+      </Modal>
 
       {/* Deposit Modal */}
       <TopUpModal 

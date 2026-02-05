@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Calculator, TrendingUp } from 'lucide-react'
 import Modal from '../ui/Modal'
 import LiquidGlassButton from '../ui/LiquidGlassButton'
+import { useApp } from '../../context/AppContext'
 
 const tariffs = [
   { id: 'okx', name: 'OKX', apy: 3.2, min: 100, max: 10000, color: '#FCD535' },
@@ -11,6 +12,7 @@ const tariffs = [
 ]
 
 export default function CalculatorModal({ isOpen, onClose }) {
+  const { formatAmount } = useApp()
   const [selectedTariff, setSelectedTariff] = useState('okx')
   const [amount, setAmount] = useState('1000')
 
@@ -58,18 +60,18 @@ export default function CalculatorModal({ isOpen, onClose }) {
         {/* Amount Input */}
         <div>
           <p className="mb-2 text-sm font-medium text-[var(--color-text-sub)]">
-            Сумма вложения (мин. {tariff.min.toLocaleString()} ₽)
+            Сумма вложения (мин. {formatAmount(tariff.min, { maximumFractionDigits: 0, minimumFractionDigits: 0 })})
           </p>
           <input
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             min={tariff.min}
-            placeholder={`От ${tariff.min.toLocaleString()} ₽`}
+            placeholder={`От ${formatAmount(tariff.min, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}`}
             className="h-14 w-full rounded-2xl bg-[var(--color-bg-base)] px-4 text-xl font-bold outline-none ring-1 ring-white/10 focus:ring-[var(--color-primary)]"
           />
           <p className="mt-2 text-xs text-[var(--color-text-sub)]">
-            Диапазон: {tariff.min.toLocaleString()} ₽ — {tariff.max.toLocaleString()} ₽
+            Диапазон: {formatAmount(tariff.min, { maximumFractionDigits: 0, minimumFractionDigits: 0 })} — {formatAmount(tariff.max, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
           </p>
         </div>
 
@@ -92,7 +94,7 @@ export default function CalculatorModal({ isOpen, onClose }) {
                 <span className="text-sm text-[var(--color-text-sub)]">За 24 часа</span>
               </div>
               <span className="text-lg font-bold text-[var(--color-green)]">
-                +{calculations.daily.toFixed(2)} ₽
+                +{formatAmount(calculations.daily, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
               </span>
             </div>
 
@@ -104,7 +106,7 @@ export default function CalculatorModal({ isOpen, onClose }) {
                 <span className="text-sm text-[var(--color-text-sub)]">За месяц</span>
               </div>
               <span className="text-lg font-bold text-[var(--color-primary)]">
-                +{calculations.monthly.toFixed(2)} ₽
+                +{formatAmount(calculations.monthly, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
               </span>
             </div>
 
@@ -116,7 +118,7 @@ export default function CalculatorModal({ isOpen, onClose }) {
                 <span className="text-sm font-medium">За год</span>
               </div>
               <span className="text-xl font-bold text-[var(--color-primary)]">
-                +{calculations.yearly.toLocaleString(undefined, { maximumFractionDigits: 0 })} ₽
+                +{formatAmount(calculations.yearly, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
               </span>
             </div>
           </motion.div>

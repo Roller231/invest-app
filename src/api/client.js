@@ -116,6 +116,18 @@ class ApiClient {
     });
   }
 
+  async createGameBet(tgId, amount) {
+    return this.request(`${endpoints.gameBet(tgId)}?amount=${amount}`, {
+      method: 'POST',
+    });
+  }
+
+  async createGamePayout(tgId, amount) {
+    return this.request(`${endpoints.gamePayout(tgId)}?amount=${amount}`, {
+      method: 'POST',
+    });
+  }
+
   // Process payouts (for testing)
   async processPayouts() {
     return this.request(endpoints.processPayouts, {

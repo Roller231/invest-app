@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useApp } from '../../context/AppContext'
 
 const banners = [
   {
@@ -74,6 +75,7 @@ const slideVariants = {
 }
 
 export default function BannerCarousel() {
+  const { formatAmount } = useApp()
   const [[page, direction], setPage] = useState([0, 0])
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
 
@@ -98,6 +100,8 @@ export default function BannerCarousel() {
   }, [isAutoPlaying, paginate])
 
   const banner = banners[currentIndex]
+  const highlightText = banner.id === 1 ? `ПЕРВЫЕ ${formatAmount(100, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}` : banner.highlight
+  const subtitleText = banner.id === 3 ? `ПРИ ДЕПОЗИТЕ ОТ ${formatAmount(50000, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}` : banner.subtitle
 
   return (
     <section 
@@ -167,7 +171,7 @@ export default function BannerCarousel() {
                   <h3 className="mt-2 text-xl font-bold leading-tight">
                     {banner.title}
                     <br />
-                    <span className="text-[var(--color-primary)]">{banner.highlight}</span> {banner.subtitle}
+                    <span className="text-[var(--color-primary)]">{highlightText}</span> {subtitleText}
                   </h3>
                   <p className="mt-2 text-xs text-[var(--color-text-sub)]">
                     {banner.description}

@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import { useApp } from '../../context/AppContext'
 
 export default function RatesWidget({ items = [] }) {
   const scrollerRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
+  const { formatAmount } = useApp()
 
   const normalized = useMemo(() => {
     return (items || []).map((it) => {
@@ -110,7 +112,7 @@ export default function RatesWidget({ items = [] }) {
 
                     <div className="mt-1 flex items-center gap-3">
                       <div className="text-xl font-bold text-white">
-                        {asset.price.toLocaleString('ru-RU', { maximumFractionDigits: 2 })} ₽
+                        {formatAmount(asset.price, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}
                       </div>
 
                       <div

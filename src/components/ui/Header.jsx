@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Plus, ArrowLeft, MoreVertical, X } from 'lucide-react'
 import { motion } from 'framer-motion'
 import TopUpModal from '../modals/TopUpModal'
+import { useApp } from '../../context/AppContext'
 
 export default function Header({ 
   balance = 0, 
@@ -14,8 +15,12 @@ export default function Header({
 }) {
   const [showTopUpModal, setShowTopUpModal] = useState(false)
   const [avatarFailed, setAvatarFailed] = useState(false)
+  const { currency, toggleCurrency, formatAmount } = useApp()
 
   const handleDeposit = onDeposit || (() => setShowTopUpModal(true))
+  const balanceValue = formatAmount(balance, { maximumFractionDigits: 2, minimumFractionDigits: 2 })
+    .replace(/\s?₽$/, '')
+    .replace(/^\$/, '')
 
   return (
     <>
@@ -48,18 +53,25 @@ export default function Header({
                   />
                 </svg>
               </div>
-              <span className="text-lg font-bold tracking-tight">
-                <span className="text-[var(--color-primary)]">BINANCE</span>
-              </span>
             </div>
           )}
         </div>
 
         <div className="flex items-center gap-2">
           <div className="balance-glass-badge">
-            <span className="balance-glass-symbol">₽</span>
-            <span className="balance-glass-value">{balance.toFixed(2)}</span>
+            <span className="balance-glass-symbol">{currency === 'USD' ? '$' : '₽'}</span>
+            <span className="balance-glass-value">{balanceValue}</span>
           </div>
+
+          <motion.button
+            type="button"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={toggleCurrency}
+            className="flex h-10 items-center justify-center rounded-full bg-[var(--color-bg-card)] px-3 text-xs font-semibold text-[var(--color-text-main)] ring-1 ring-white/10"
+          >
+            {currency === 'USD' ? '$' : '₽'}
+          </motion.button>
           
           <motion.button
             whileHover={{ scale: 1.05 }}

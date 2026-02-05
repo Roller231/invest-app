@@ -26,7 +26,7 @@ import { useToast } from './ui/ToastProvider.jsx'
 import { api } from '../api'
 
 export default function Profile() {
-  const { user, stats, tariffs, activeDeposit, toggleAutoReinvest, collectAccumulated, reinvest, withdrawDeposit, refreshUser, processPayouts } = useApp()
+  const { user, stats, tariffs, activeDeposit, toggleAutoReinvest, collectAccumulated, reinvest, withdrawDeposit, refreshUser, processPayouts, formatAmount } = useApp()
   const toast = useToast()
   const [showDepositModal, setShowDepositModal] = useState(false)
   const [showWithdrawDepositModal, setShowWithdrawDepositModal] = useState(false)
@@ -123,6 +123,15 @@ export default function Profile() {
     }
   })
 
+  const formatFaqAnswer = (text) => {
+    const s = String(text || '')
+    return s.replace(/(\d[\d\s]*)\s*₽/g, (m, raw) => {
+      const n = Number(String(raw).replace(/\s+/g, ''))
+      if (!Number.isFinite(n)) return m
+      return formatAmount(n, { maximumFractionDigits: 0, minimumFractionDigits: 0 })
+    })
+  }
+
   const formatTime = (num) => num.toString().padStart(2, '0')
 
   return (
@@ -165,7 +174,7 @@ export default function Profile() {
             animate={{ scale: 1 }}
             className="text-3xl font-bold"
           >
-            {deposit.toLocaleString()} ₽
+            {formatAmount(deposit, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}
           </motion.p>
 
           {deposit > 0 && stats?.time_to_next_payout > 0 && (
@@ -192,13 +201,13 @@ export default function Profile() {
             <div className="rounded-2xl bg-[var(--color-bg-base)] p-3">
               <p className="text-xs text-[var(--color-text-sub)]">Накоплено</p>
               <p className="text-lg font-bold text-[var(--color-primary)]">
-                {accumulated.toLocaleString()} ₽
+                {formatAmount(accumulated, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}
               </p>
             </div>
             <div className="rounded-2xl bg-[var(--color-bg-base)] p-3">
               <p className="text-xs text-[var(--color-text-sub)]">Всего заработано</p>
               <p className="text-lg font-bold text-[var(--color-green)]">
-                +{profit.toLocaleString()} ₽
+                +{formatAmount(profit, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}
               </p>
             </div>
           </div>
@@ -215,7 +224,7 @@ export default function Profile() {
                 setLoading(true)
                 try {
                   const result = await reinvest()
-                  toast.success(`Новый вклад: ${result.new_deposit_amount?.toLocaleString()}₽`, 'Реинвест выполнен')
+                  toast.success(`Новый вклад: ${formatAmount(result.new_deposit_amount || 0, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}`, 'Реинвест выполнен')
                 } catch (e) {
                   toast.error(e.message, 'Ошибка')
                 } finally {
@@ -234,7 +243,7 @@ export default function Profile() {
                 setLoading(true)
                 try {
                   const result = await collectAccumulated()
-                  toast.success(`+${result.collected.toFixed(2)}₽`, 'Переведено на баланс')
+                  toast.success(`+${formatAmount(result.collected || 0, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`, 'Переведено на баланс')
                 } catch (e) {
                   toast.error(e.message, 'Ошибка')
                 } finally {
@@ -373,7 +382,7 @@ export default function Profile() {
               </div>
               <div className="mt-4 rounded-2xl bg-[var(--color-bg-base)] p-3">
                 <p className="text-xs text-[var(--color-text-sub)]">Ваш депозит</p>
-                <p className="font-semibold">{deposit.toLocaleString()} ₽</p>
+                <p className="font-semibold">{formatAmount(deposit, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}</p>
               </div>
             </motion.div>
           ) : (
@@ -399,7 +408,7 @@ export default function Profile() {
               <div className="mt-4 rounded-2xl bg-[var(--color-bg-base)] p-3">
                 <p className="text-xs text-[var(--color-text-sub)]">До следующего тарифа</p>
                 <p className="font-semibold text-[var(--color-primary)]">
-                  {amountToNextTariff.toLocaleString()} ₽
+                  {formatAmount(amountToNextTariff, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
                 </p>
               </div>
               {nextTariff && (
@@ -467,7 +476,7 @@ export default function Profile() {
                     className="overflow-hidden"
                   >
                     <p className="px-4 pb-4 text-sm text-[var(--color-text-sub)]">
-                      {item.answer}
+                      {formatFaqAnswer(item.answer)}
                     </p>
                   </motion.div>
                 )}

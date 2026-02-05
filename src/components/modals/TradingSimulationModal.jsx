@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import Modal from '../ui/Modal'
 import LiquidGlassButton from '../ui/LiquidGlassButton'
+import { useApp } from '../../context/AppContext'
 
 const tradingSteps = [
   { id: 1, text: 'Инициализация торгового модуля...', icon: Zap, duration: 800 },
@@ -36,6 +37,7 @@ const strategies = [
 ]
 
 export default function TradingSimulationModal({ isOpen, onClose, tariff, depositAmount }) {
+  const { formatAmount } = useApp()
   const [isRunning, setIsRunning] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   const [completedSteps, setCompletedSteps] = useState([])
@@ -150,7 +152,7 @@ export default function TradingSimulationModal({ isOpen, onClose, tariff, deposi
           {depositAmount && (
             <div className="mt-3 pt-3 border-t border-white/10">
               <p className="text-sm text-[var(--color-text-sub)]">Сумма в работе</p>
-              <p className="font-bold text-xl">{depositAmount.toLocaleString()} ₽</p>
+              <p className="font-bold text-xl">{formatAmount(depositAmount, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}</p>
             </div>
           )}
         </div>
@@ -221,7 +223,7 @@ export default function TradingSimulationModal({ isOpen, onClose, tariff, deposi
                   </div>
                   <div className="flex items-center gap-2 text-[var(--color-text-sub)]">
                     <TrendingUp className="h-4 w-4" />
-                    <span>Ожидаемая прибыль: <span className="text-[var(--color-green)] font-semibold">+{profitPreview?.toFixed(2)} ₽/день</span></span>
+                    <span>Ожидаемая прибыль: <span className="text-[var(--color-green)] font-semibold">+{formatAmount(profitPreview || 0, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}/день</span></span>
                   </div>
                 </motion.div>
 
@@ -245,7 +247,7 @@ export default function TradingSimulationModal({ isOpen, onClose, tariff, deposi
                         </span>
                         <span className="text-[var(--color-text-sub)]">{trade.time}</span>
                         <span className={trade.profit >= 0 ? 'text-[var(--color-green)]' : 'text-[var(--color-red)]'}>
-                          {trade.profit >= 0 ? '+' : ''}{trade.profit} ₽
+                          {trade.profit >= 0 ? '+' : ''}{formatAmount(trade.profit, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
                         </span>
                       </motion.div>
                     ))}

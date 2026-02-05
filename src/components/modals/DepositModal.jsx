@@ -8,7 +8,7 @@ import { useApp } from '../../context/AppContext'
 const quickAmounts = [500, 1000, 5000, 10000, 50000, 100000]
 
 export default function DepositModal({ isOpen, onClose }) {
-  const { createDeposit, tariffs, user } = useApp()
+  const { createDeposit, tariffs, user, formatAmount } = useApp()
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1)
@@ -47,7 +47,7 @@ export default function DepositModal({ isOpen, onClose }) {
     try {
       const depositAmount = parseFloat(amount)
       if (depositAmount < 100) {
-        throw new Error('Минимальная сумма 100₽')
+        throw new Error(`Минимальная сумма ${formatAmount(100, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}`)
       }
       if (depositAmount > (user?.balance || 0)) {
         throw new Error('Недостаточно средств на балансе')
@@ -75,7 +75,7 @@ export default function DepositModal({ isOpen, onClose }) {
           {/* Balance Info */}
           <div className="rounded-2xl bg-[var(--color-bg-base)] p-4">
             <p className="text-xs text-[var(--color-text-sub)] mb-1">Доступно для инвестиций</p>
-            <p className="text-2xl font-bold">{(user?.balance || 0).toLocaleString()} ₽</p>
+            <p className="text-2xl font-bold">{formatAmount(user?.balance || 0, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}</p>
           </div>
 
           {/* Amount Input */}
@@ -97,7 +97,7 @@ export default function DepositModal({ isOpen, onClose }) {
                         : 'bg-[var(--color-bg-base)] text-[var(--color-text-sub)]'
                   }`}
                 >
-                  {amt.toLocaleString()} ₽
+                  {formatAmount(amt, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
                 </button>
               ))}
             </div>
@@ -105,7 +105,7 @@ export default function DepositModal({ isOpen, onClose }) {
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="Введите сумму (мин. 100₽)"
+              placeholder={`Введите сумму (мин. ${formatAmount(100, { maximumFractionDigits: 0, minimumFractionDigits: 0 })})`}
               className="h-12 w-full rounded-2xl bg-[var(--color-bg-base)] px-4 text-lg font-semibold outline-none ring-1 ring-white/10 focus:ring-[var(--color-primary)]"
             />
           </div>
@@ -139,7 +139,7 @@ export default function DepositModal({ isOpen, onClose }) {
                   <span className="text-sm text-[var(--color-text-sub)]">Доход в день:</span>
                 </div>
                 <span className="font-bold text-[var(--color-green)]">
-                  +{investmentInfo.tariff.daily_percent}% (+{investmentInfo.dailyProfit.toFixed(2)}₽)
+                  +{investmentInfo.tariff.daily_percent}% (+{formatAmount(investmentInfo.dailyProfit, { maximumFractionDigits: 2, minimumFractionDigits: 2 })})
                 </span>
               </div>
               
@@ -149,7 +149,7 @@ export default function DepositModal({ isOpen, onClose }) {
                   <span className="text-sm text-[var(--color-text-sub)]">Через 24 часа:</span>
                 </div>
                 <span className="font-bold text-lg">
-                  {investmentInfo.totalAfter24h.toFixed(2)}₽
+                  {formatAmount(investmentInfo.totalAfter24h, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
                 </span>
               </div>
             </motion.div>
@@ -168,7 +168,7 @@ export default function DepositModal({ isOpen, onClose }) {
             onClick={handleCreateDeposit}
             disabled={loading || !amount || parseFloat(amount) < 100 || parseFloat(amount) > (user?.balance || 0)}
           >
-            {loading ? 'Создание вклада...' : `Инвестировать ${amount ? `${parseInt(amount).toLocaleString()} ₽` : ''}`}
+            {loading ? 'Создание вклада...' : `Инвестировать ${amount ? `${formatAmount(parseInt(amount) || 0, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}` : ''}`}
           </LiquidGlassButton>
         </div>
       )}
@@ -190,7 +190,7 @@ export default function DepositModal({ isOpen, onClose }) {
           <div>
             <h3 className="text-xl font-bold">Вклад создан!</h3>
             <p className="mt-2 text-sm text-[var(--color-text-sub)]">
-              {parseInt(amount).toLocaleString()} ₽ успешно инвестировано
+              {formatAmount(parseInt(amount) || 0, { maximumFractionDigits: 0, minimumFractionDigits: 0 })} успешно инвестировано
             </p>
           </div>
 

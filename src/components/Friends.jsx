@@ -17,7 +17,7 @@ import SupportSection from './ui/SupportSection'
 import { useApp } from '../context/AppContext'
 
 export default function Friends() {
-  const { user, getReferralStats } = useApp()
+  const { user, getReferralStats, formatAmount, currency } = useApp()
   const [copied, setCopied] = useState(false)
   const [refStats, setRefStats] = useState(null)
 
@@ -136,7 +136,7 @@ export default function Friends() {
             transition={{ delay: 0.1 }}
             className="card-surface p-4 text-center"
           >
-            <p className="text-3xl font-bold">{stats.earned} <span className="text-lg">₽</span></p>
+            <p className="text-3xl font-bold">{formatAmount(stats.earned, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}</p>
             <p className="text-sm text-[var(--color-text-sub)]">Заработано</p>
           </motion.div>
         </div>
@@ -165,10 +165,10 @@ export default function Friends() {
           </div>
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-red)] text-xs font-bold text-white">₽</span>
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-red)] text-xs font-bold text-white">{currency === 'USD' ? '$' : '₽'}</span>
               <span className="text-sm">Всего пополнено:</span>
             </div>
-            <span className="font-bold">{stats.totalDeposited}₽</span>
+            <span className="font-bold">{formatAmount(stats.totalDeposited, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}</span>
           </div>
         </div>
       </section>

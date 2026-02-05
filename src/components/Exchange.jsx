@@ -8,12 +8,14 @@ import {
 import Header from './ui/Header'
 import LiquidGlassButton from './ui/LiquidGlassButton'
 import { useApp } from '../context/AppContext'
+import { useToast } from './ui/ToastProvider'
 
 const ROUND_SECONDS = 6
 const CHART_POINTS = 40
 
 export default function Exchange() {
-  const { user } = useApp()
+  const { user, currency, convertAmount, convertToRub, createGameBet, createGamePayout, formatAmount } = useApp()
+  const toast = useToast()
   const userKey = user?.id ?? user?.tg_id ?? 'dev'
   const initialBalance = useMemo(() => {
     const v = Number(user?.balance || 0)
@@ -21,7 +23,11 @@ export default function Exchange() {
   }, [user?.balance])
 
   const [balance, setBalance] = useState(initialBalance)
-  const [bet, setBet] = useState(() => Math.max(50, Math.min(500, Math.floor(initialBalance * 0.05) || 100)))
+  const [bet, setBet] = useState(() => {
+    const displayBalance = convertAmount(initialBalance)
+    const v = Math.floor(displayBalance * 0.05) || 1
+    return Math.max(1, Math.min(Math.floor(displayBalance) || 1, v))
+  })
   const [price, setPrice] = useState(2.4458)
   const [chart, setChart] = useState(() => Array.from({ length: CHART_POINTS }, () => 2.4458))
   const [round, setRound] = useState({
@@ -42,7 +48,11 @@ export default function Exchange() {
     if (initRef.current === userKey) return
     initRef.current = userKey
     setBalance(initialBalance)
-    setBet(Math.max(50, Math.min(500, Math.floor(initialBalance * 0.05) || 100)))
+    setBet(() => {
+      const displayBalance = convertAmount(initialBalance)
+      const v = Math.floor(displayBalance * 0.05) || 1
+      return Math.max(1, Math.min(Math.floor(displayBalance) || 1, v))
+    })
     setRound({
       status: 'idle',
       secondsLeft: ROUND_SECONDS,
@@ -52,15 +62,17 @@ export default function Exchange() {
       result: null,
       payout: 0,
     })
-  }, [initialBalance, userKey])
+  }, [convertAmount, initialBalance, userKey])
 
   useEffect(() => {
     setBet((b) => {
       const next = Number(b) || 0
-      if (next <= 0) return 100
-      return Math.min(next, Math.max(0, balance))
+      const displayBalance = convertAmount(balance)
+      if (displayBalance <= 0) return 1
+      if (next < 1) return 1
+      return Math.min(next, Math.floor(displayBalance))
     })
-  }, [balance])
+  }, [balance, convertAmount])
 
   useEffect(() => {
     const stop = () => {
@@ -96,16 +108,23 @@ export default function Exchange() {
     })
   }
 
-  const startRound = (direction) => {
-    const stake = Math.max(10, Math.floor(Number(bet) || 0))
-    if (stake <= 0) return
+  const startRound = async (direction) => {
+    const displayStake = Number(bet) || 0
+    const stake = Math.floor(convertToRub(displayStake))
+    if (stake < 1) return
     if (stake > balance) return
 
     if (timerRef.current) clearInterval(timerRef.current)
     if (tickRef.current) clearInterval(tickRef.current)
 
     const start = price
-    setBalance((b) => b - stake)
+    try {
+      const res = await createGameBet(stake)
+      if (typeof res?.new_balance === 'number') setBalance(res.new_balance)
+    } catch (e) {
+      toast.error(e.message || 'Не удалось сделать ставку', 'Ошибка')
+      return
+    }
     setRound({
       status: 'running',
       secondsLeft: ROUND_SECONDS,
@@ -142,7 +161,13 @@ export default function Exchange() {
         const isUp = end > start
         const win = direction === 'up' ? isUp : !isUp
         const payout = win ? Math.floor(stake * 1.85) : 0
-        if (payout > 0) setBalance((b) => b + payout)
+        if (payout > 0) {
+          createGamePayout(payout)
+            .then((res) => {
+              if (typeof res?.new_balance === 'number') setBalance(res.new_balance)
+            })
+            .catch(() => {})
+        }
 
         return {
           ...r,
@@ -229,18 +254,26 @@ export default function Exchange() {
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-2xl bg-[var(--color-bg-base)] p-3">
             <p className="text-xs text-[var(--color-text-sub)]">Баланс игры</p>
-            <p className="text-lg font-bold">{Math.max(0, Math.floor(balance)).toLocaleString()} ₽</p>
+            <p className="text-lg font-bold">
+              {currency === 'USD' ? '$' : '₽'}{convertAmount(Math.max(0, Math.floor(balance))).toLocaleString(currency === 'USD' ? 'en-US' : 'ru-RU', {
+                maximumFractionDigits: 0,
+                minimumFractionDigits: 0,
+              })}
+            </p>
           </div>
           <div className="rounded-2xl bg-[var(--color-bg-base)] p-3">
             <p className="text-xs text-[var(--color-text-sub)]">Ставка</p>
-            <input
-              type="number"
-              value={bet}
-              min={10}
-              max={Math.max(10, Math.floor(balance))}
-              onChange={(e) => setBet(e.target.value)}
-              className="mt-1 w-full bg-transparent text-lg font-bold outline-none"
-            />
+            <div className="flex items-center gap-1 mt-1">
+              <span className="text-lg font-bold">{currency === 'USD' ? '$' : '₽'}</span>
+              <input
+                type="number"
+                value={bet}
+                min={10}
+                max={Math.max(10, Math.floor(balance))}
+                onChange={(e) => setBet(e.target.value)}
+                className="w-full bg-transparent text-lg font-bold outline-none"
+              />
+            </div>
           </div>
         </div>
 
@@ -274,7 +307,7 @@ export default function Exchange() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold">
-                    {round.result === 'win' ? `+${round.payout} ₽` : 'Ставка не сыграла'}
+                    {round.result === 'win' ? `+${formatAmount(round.payout, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}` : 'Ставка не сыграла'}
                   </p>
                 </div>
                 <LiquidGlassButton variant="secondary" icon={RotateCcw} onClick={resetRound}>

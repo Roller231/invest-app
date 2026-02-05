@@ -104,3 +104,80 @@ async def create_withdraw_request(
         "new_balance": user.balance,
         "status": "pending",
     }
+
+
+@router.post("/{tg_id}/game/bet")
+async def create_game_bet(
+    tg_id: int,
+    amount: float,
+    db: AsyncSession = Depends(get_db)
+):
+    """Deduct bet amount from user balance for Exchange mini-game"""
+    user_service = UserService(db)
+    user = await user_service.get_by_tg_id(tg_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be positive")
+
+    if amount > user.balance:
+        raise HTTPException(status_code=400, detail="Insufficient balance")
+
+    user.balance -= amount
+    await db.commit()
+
+    tx_service = TransactionService(db)
+    transaction = await tx_service.create_transaction(
+        user_id=user.id,
+        tx_type="game_bet",
+        amount=-amount,
+        status="completed",
+        description=f"Ставка в мини-игре {amount}₽",
+        is_visible=False,
+    )
+
+    return {
+        "success": True,
+        "transaction_id": transaction.id,
+        "amount": amount,
+        "new_balance": user.balance,
+        "status": "completed",
+    }
+
+
+@router.post("/{tg_id}/game/payout")
+async def create_game_payout(
+    tg_id: int,
+    amount: float,
+    db: AsyncSession = Depends(get_db)
+):
+    """Add payout amount to user balance for Exchange mini-game"""
+    user_service = UserService(db)
+    user = await user_service.get_by_tg_id(tg_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be positive")
+
+    user.balance += amount
+    await db.commit()
+
+    tx_service = TransactionService(db)
+    transaction = await tx_service.create_transaction(
+        user_id=user.id,
+        tx_type="game_payout",
+        amount=amount,
+        status="completed",
+        description=f"Выигрыш в мини-игре {amount}₽",
+        is_visible=False,
+    )
+
+    return {
+        "success": True,
+        "transaction_id": transaction.id,
+        "amount": amount,
+        "new_balance": user.balance,
+        "status": "completed",
+    }

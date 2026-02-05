@@ -11,6 +11,22 @@ export function AppProvider({ children }) {
   const [activeDeposit, setActiveDeposit] = useState(null);
   const [liveTransactions, setLiveTransactions] = useState([]);
   const [topStrip, setTopStrip] = useState([]);
+  const [currency, setCurrency] = useState(() => {
+    try {
+      return localStorage.getItem('currency') || 'RUB'
+    } catch {
+      return 'RUB'
+    }
+  })
+  const [usdRubRate, setUsdRubRate] = useState(() => {
+    try {
+      const raw = localStorage.getItem('usdRubRate')
+      const n = raw ? Number(raw) : NaN
+      return Number.isFinite(n) && n > 0 ? n : 0
+    } catch {
+      return 0
+    }
+  })
   const [wsStatus, setWsStatus] = useState('disconnected');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,6 +34,90 @@ export function AppProvider({ children }) {
   const wsRef = useRef(null);
   const wsReconnectTimerRef = useRef(null);
   const wsPingTimerRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('currency', currency)
+    } catch {
+      // ignore
+    }
+  }, [currency])
+
+  useEffect(() => {
+    if (!usdRubRate) return
+    try {
+      localStorage.setItem('usdRubRate', String(usdRubRate))
+    } catch {
+      // ignore
+    }
+  }, [usdRubRate])
+
+  useEffect(() => {
+    let mounted = true
+
+    const fetchRate = async () => {
+      try {
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub')
+        const data = await res.json()
+        const rate = Number(data?.tether?.rub)
+        if (!mounted) return
+        if (Number.isFinite(rate) && rate > 0) setUsdRubRate(rate)
+      } catch {
+        // ignore
+      }
+    }
+
+    fetchRate()
+    const id = setInterval(fetchRate, 60_000)
+
+    return () => {
+      mounted = false
+      clearInterval(id)
+    }
+  }, [])
+
+  const toggleCurrency = useCallback(() => {
+    setCurrency((c) => (c === 'RUB' ? 'USD' : 'RUB'))
+  }, [])
+
+  const convertAmount = useCallback(
+    (rubAmount) => {
+      const n = Number(rubAmount)
+      if (!Number.isFinite(n)) return 0
+      if (currency === 'USD') {
+        const rate = Number(usdRubRate)
+        if (!Number.isFinite(rate) || rate <= 0) return 0
+        return n / rate
+      }
+      return n
+    },
+    [currency, usdRubRate]
+  )
+
+  const convertToRub = useCallback(
+    (displayAmount) => {
+      const n = Number(displayAmount)
+      if (!Number.isFinite(n)) return 0
+      if (currency === 'USD') {
+        const rate = Number(usdRubRate)
+        if (!Number.isFinite(rate) || rate <= 0) return 0
+        return n * rate
+      }
+      return n
+    },
+    [currency, usdRubRate]
+  )
+
+  const formatAmount = useCallback(
+    (rubAmount, { maximumFractionDigits = 2, minimumFractionDigits = 0 } = {}) => {
+      const value = convertAmount(rubAmount)
+      const locale = currency === 'USD' ? 'en-US' : 'ru-RU'
+      const symbol = currency === 'USD' ? '$' : '₽'
+      const formatted = value.toLocaleString(locale, { maximumFractionDigits, minimumFractionDigits })
+      return currency === 'USD' ? `${symbol}${formatted}` : `${formatted} ${symbol}`
+    },
+    [convertAmount, currency]
+  )
 
   // Get Telegram WebApp data
   const getTelegramUser = useCallback(() => {
@@ -163,6 +263,32 @@ export function AppProvider({ children }) {
     const result = await api.activatePromo(user.tg_id, normalized);
     await refreshUser();
     return result;
+  }, [user, refreshUser]);
+
+  const createGameBet = useCallback(async (amount) => {
+    if (!user) return;
+
+    try {
+      const result = await api.createGameBet(user.tg_id, amount);
+      await refreshUser();
+      return result;
+    } catch (err) {
+      console.error('Game bet error:', err);
+      throw err;
+    }
+  }, [user, refreshUser]);
+
+  const createGamePayout = useCallback(async (amount) => {
+    if (!user) return;
+
+    try {
+      const result = await api.createGamePayout(user.tg_id, amount);
+      await refreshUser();
+      return result;
+    } catch (err) {
+      console.error('Game payout error:', err);
+      throw err;
+    }
   }, [user, refreshUser]);
 
   // Toggle auto reinvest
@@ -426,6 +552,12 @@ export function AppProvider({ children }) {
     activeDeposit,
     liveTransactions,
     topStrip,
+    currency,
+    usdRubRate,
+    toggleCurrency,
+    convertAmount,
+    convertToRub,
+    formatAmount,
     wsStatus,
     loading,
     error,
@@ -436,6 +568,8 @@ export function AppProvider({ children }) {
     reinvest,
     withdrawDeposit,
     createWithdraw,
+    createGameBet,
+    createGamePayout,
     processPayouts,
     getLiveTransactions,
     getUserTransactions,
