@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useTranslation } from '../../i18n'
 
 import usdtPng from '../../assets/bottom-icons/usdt.png'
 import tonPng from '../../assets/bottom-icons/ton.png'
@@ -88,10 +89,11 @@ function PlusCircle({ value = '+10', delay = 0.4 }) {
 }
 
 export default function CryptoIcons() {
+  const { t } = useTranslation()
   return (
     <div className="grid grid-cols-2 gap-2">
       <div className="space-y-1">
-        <div className="text-[9px] font-semibold text-[var(--color-text-sub)]">Принимаем платежи:</div>
+        <div className="text-[9px] font-semibold text-[var(--color-text-sub)]">{t('footer.acceptPayments')}:</div>
 
         <div className="flex items-center gap-1">
           {paymentIcons.map((item, index) => (
@@ -116,7 +118,7 @@ export default function CryptoIcons() {
 
       <div className="flex flex-col items-end space-y-1">
         <div className="self-end text-right text-[9px] font-semibold text-[var(--color-text-sub)]">
-          Работаем с:
+          {t('footer.workWith')}:
         </div>
 
         <div className="flex items-center justify-end gap-1">

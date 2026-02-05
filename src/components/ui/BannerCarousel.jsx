@@ -2,54 +2,55 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
+import { useTranslation } from '../../i18n'
 
-const banners = [
+const getBanners = (t, lang) => [
   {
     id: 1,
     gradient: 'from-[#1a1f2e] via-[#2a1f3d] to-[#1a2a3d]',
-    tag: 'Промокод',
+    tag: lang === 'ru' ? 'Промокод' : 'Promo',
     tagValue: 'NG2026',
     emoji: '🎁',
-    title: 'ПОЛУЧИ НА СВОЙ СЧЕТ',
-    highlight: 'ПЕРВЫЕ 100₽',
-    subtitle: 'ДЛЯ СТАРТА',
-    description: 'ВВОДИ ПРОМОКОД НА ГЛАВНОЙ СТРАНИЦЕ ДЛЯ ПОЛУЧЕНИЯ ПРИЗА!',
+    title: lang === 'ru' ? 'ПОЛУЧИ НА СВОЙ СЧЕТ' : 'GET ON YOUR ACCOUNT',
+    highlight: t('banners.first100'),
+    subtitle: lang === 'ru' ? 'ДЛЯ СТАРТА' : 'TO START',
+    description: lang === 'ru' ? 'ВВОДИ ПРОМОКОД НА ГЛАВНОЙ СТРАНИЦЕ!' : 'ENTER PROMO ON HOME PAGE!',
     icon: '🎅',
   },
   {
     id: 2,
     gradient: 'from-[#1a2a1f] via-[#1f3d2a] to-[#1a3d2a]',
-    tag: 'Акция',
+    tag: lang === 'ru' ? 'Акция' : 'Promo',
     tagValue: 'x2',
     emoji: '💰',
-    title: 'УДВОЕННЫЙ КЭШБЭК',
-    highlight: 'ДО 4%',
-    subtitle: 'НА ВСЕ ДЕПОЗИТЫ',
-    description: 'ТОЛЬКО ДО КОНЦА МЕСЯЦА! УСПЕЙ ПОЛУЧИТЬ МАКСИМАЛЬНУЮ ВЫГОДУ',
+    title: t('banners.dailyProfit'),
+    highlight: t('banners.upTo') + ' 4%',
+    subtitle: t('banners.perDay'),
+    description: lang === 'ru' ? 'УСПЕЙ ПОЛУЧИТЬ МАКСИМАЛЬНУЮ ВЫГОДУ' : 'GET MAXIMUM PROFIT',
     icon: '💎',
   },
   {
     id: 3,
     gradient: 'from-[#2a1f1a] via-[#3d2a1f] to-[#3d2a1a]',
     tag: 'VIP',
-    tagValue: 'СТАТУС',
+    tagValue: lang === 'ru' ? 'СТАТУС' : 'STATUS',
     emoji: '👑',
-    title: 'ПОЛУЧИ VIP СТАТУС',
-    highlight: 'БЕСПЛАТНО',
-    subtitle: 'ПРИ ДЕПОЗИТЕ ОТ 50 000₽',
-    description: 'ПЕРСОНАЛЬНЫЙ МЕНЕДЖЕР И ПОВЫШЕННЫЕ ЛИМИТЫ',
+    title: t('banners.bonusDeposit'),
+    highlight: '+10%',
+    subtitle: t('banners.depositFrom'),
+    description: lang === 'ru' ? 'ПЕРСОНАЛЬНЫЙ МЕНЕДЖЕР' : 'PERSONAL MANAGER',
     icon: '🏆',
   },
   {
     id: 4,
     gradient: 'from-[#1f1a2a] via-[#2a1f3d] to-[#1f2a3d]',
-    tag: 'Партнёрка',
+    tag: lang === 'ru' ? 'Партнёрка' : 'Referral',
     tagValue: '31%',
     emoji: '🤝',
-    title: 'ПРИГЛАШАЙ ДРУЗЕЙ',
-    highlight: 'ДО 31%',
-    subtitle: 'ОТ ДЕПОЗИТОВ',
-    description: '3 УРОВНЯ ПАРТНЁРСКОЙ ПРОГРАММЫ. ПОЛУЧАЙ ПАССИВНЫЙ ДОХОД!',
+    title: t('banners.inviteFriends'),
+    highlight: t('banners.getPercent') + ' 31%',
+    subtitle: t('banners.fromDeposits'),
+    description: lang === 'ru' ? '3 УРОВНЯ ПАРТНЁРСКОЙ ПРОГРАММЫ' : '3 REFERRAL LEVELS',
     icon: '🚀',
   },
 ]
@@ -76,6 +77,8 @@ const slideVariants = {
 
 export default function BannerCarousel() {
   const { formatAmount } = useApp()
+  const { t, language } = useTranslation()
+  const banners = getBanners(t, language)
   const [[page, direction], setPage] = useState([0, 0])
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
 
@@ -100,8 +103,8 @@ export default function BannerCarousel() {
   }, [isAutoPlaying, paginate])
 
   const banner = banners[currentIndex]
-  const highlightText = banner.id === 1 ? `ПЕРВЫЕ ${formatAmount(100, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}` : banner.highlight
-  const subtitleText = banner.id === 3 ? `ПРИ ДЕПОЗИТЕ ОТ ${formatAmount(50000, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}` : banner.subtitle
+  const highlightText = banner.id === 1 ? `${t('banners.first100')} ${formatAmount(100, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}` : banner.highlight
+  const subtitleText = banner.id === 3 ? `${t('banners.depositFrom')} ${formatAmount(50000, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}` : banner.subtitle
 
   return (
     <section 

@@ -4,11 +4,13 @@ import { Wallet, CheckCircle, TrendingUp, Clock, Percent } from 'lucide-react'
 import Modal from '../ui/Modal'
 import LiquidGlassButton from '../ui/LiquidGlassButton'
 import { useApp } from '../../context/AppContext'
+import { useTranslation } from '../../i18n'
 
 const quickAmounts = [500, 1000, 5000, 10000, 50000, 100000]
 
 export default function DepositModal({ isOpen, onClose }) {
   const { createDeposit, tariffs, user, formatAmount } = useApp()
+  const { t } = useTranslation()
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1)
@@ -47,10 +49,10 @@ export default function DepositModal({ isOpen, onClose }) {
     try {
       const depositAmount = parseFloat(amount)
       if (depositAmount < 100) {
-        throw new Error(`Минимальная сумма ${formatAmount(100, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}`)
+        throw new Error(`${t('toasts.minAmount')} ${formatAmount(100, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}`)
       }
       if (depositAmount > (user?.balance || 0)) {
-        throw new Error('Недостаточно средств на балансе')
+        throw new Error(t('toasts.insufficientBalance'))
       }
       await createDeposit(depositAmount)
       setStep(2)
@@ -69,19 +71,19 @@ export default function DepositModal({ isOpen, onClose }) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title={step === 1 ? "Инвестировать" : "Успешно!"}>
+    <Modal isOpen={isOpen} onClose={handleClose} title={step === 1 ? t('modals.deposit.title') : t('modals.deposit.success')}>
       {step === 1 && (
         <div className="space-y-5">
           {/* Balance Info */}
           <div className="rounded-2xl bg-[var(--color-bg-base)] p-4">
-            <p className="text-xs text-[var(--color-text-sub)] mb-1">Доступно для инвестиций</p>
+            <p className="text-xs text-[var(--color-text-sub)] mb-1">{t('modals.deposit.yourBalance')}</p>
             <p className="text-2xl font-bold">{formatAmount(user?.balance || 0, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}</p>
           </div>
 
           {/* Amount Input */}
           <div>
             <p className="mb-3 text-sm font-medium text-[var(--color-text-sub)]">
-              Сумма вклада
+              {t('modals.deposit.enterAmount')}
             </p>
             <div className="flex gap-2 flex-wrap mb-3">
               {quickAmounts.map((amt) => (
@@ -105,7 +107,7 @@ export default function DepositModal({ isOpen, onClose }) {
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder={`Введите сумму (мин. ${formatAmount(100, { maximumFractionDigits: 0, minimumFractionDigits: 0 })})`}
+              placeholder={`${t('modals.deposit.enterAmount')} (${t('modals.deposit.minAmount')} ${formatAmount(100, { maximumFractionDigits: 0, minimumFractionDigits: 0 })})`}
               className="h-12 w-full rounded-2xl bg-[var(--color-bg-base)] px-4 text-lg font-semibold outline-none ring-1 ring-white/10 focus:ring-[var(--color-primary)]"
             />
           </div>
@@ -120,7 +122,7 @@ export default function DepositModal({ isOpen, onClose }) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-[var(--color-primary)]" />
-                  <span className="text-sm text-[var(--color-text-sub)]">Тариф:</span>
+                  <span className="text-sm text-[var(--color-text-sub)]">{t('modals.deposit.tariff')}:</span>
                 </div>
                 <span 
                   className="font-bold px-2 py-0.5 rounded-full text-sm"
@@ -136,7 +138,7 @@ export default function DepositModal({ isOpen, onClose }) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Percent className="h-4 w-4 text-[var(--color-green)]" />
-                  <span className="text-sm text-[var(--color-text-sub)]">Доход в день:</span>
+                  <span className="text-sm text-[var(--color-text-sub)]">{t('modals.deposit.dailyProfit')}:</span>
                 </div>
                 <span className="font-bold text-[var(--color-green)]">
                   +{investmentInfo.tariff.daily_percent}% (+{formatAmount(investmentInfo.dailyProfit, { maximumFractionDigits: 2, minimumFractionDigits: 2 })})
@@ -146,7 +148,7 @@ export default function DepositModal({ isOpen, onClose }) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-[var(--color-primary)]" />
-                  <span className="text-sm text-[var(--color-text-sub)]">Через 24 часа:</span>
+                  <span className="text-sm text-[var(--color-text-sub)]">{t('modals.deposit.after24h')}:</span>
                 </div>
                 <span className="font-bold text-lg">
                   {formatAmount(investmentInfo.totalAfter24h, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
@@ -168,7 +170,7 @@ export default function DepositModal({ isOpen, onClose }) {
             onClick={handleCreateDeposit}
             disabled={loading || !amount || parseFloat(amount) < 100 || parseFloat(amount) > (user?.balance || 0)}
           >
-            {loading ? 'Создание вклада...' : `Инвестировать ${amount ? `${formatAmount(parseInt(amount) || 0, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}` : ''}`}
+            {loading ? t('modals.deposit.creating') : `${t('modals.deposit.invest')} ${amount ? `${formatAmount(parseInt(amount) || 0, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}` : ''}`}
           </LiquidGlassButton>
         </div>
       )}
@@ -188,9 +190,9 @@ export default function DepositModal({ isOpen, onClose }) {
           </motion.div>
           
           <div>
-            <h3 className="text-xl font-bold">Вклад создан!</h3>
+            <h3 className="text-xl font-bold">{t('modals.deposit.success')}</h3>
             <p className="mt-2 text-sm text-[var(--color-text-sub)]">
-              {formatAmount(parseInt(amount) || 0, { maximumFractionDigits: 0, minimumFractionDigits: 0 })} успешно инвестировано
+              {formatAmount(parseInt(amount) || 0, { maximumFractionDigits: 0, minimumFractionDigits: 0 })} {t('modals.deposit.successDesc')}
             </p>
           </div>
 
@@ -209,7 +211,7 @@ export default function DepositModal({ isOpen, onClose }) {
             size="lg"
             onClick={handleClose}
           >
-            Отлично!
+            {t('common.confirm')}
           </LiquidGlassButton>
         </motion.div>
       )}

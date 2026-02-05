@@ -15,6 +15,7 @@ import TopUpModal from './modals/TopUpModal'
 import Modal from './ui/Modal'
 import { useApp } from '../context/AppContext'
 import { useToast } from './ui/ToastProvider.jsx'
+import { useTranslation } from '../i18n'
 
 const toneStyles = {
   neutral: 'border border-white/10',
@@ -22,9 +23,10 @@ const toneStyles = {
   primary: 'border border-[var(--color-primary)] bg-gradient-to-br from-[#2B3139] to-[#1E2329]',
 }
 
-export default function Dashboard() {
+export default function Dashboard({ onAvatarClick }) {
   const { user, tariffs, liveTransactions, topStrip, activatePromo, formatAmount } = useApp()
   const toast = useToast()
+  const { t } = useTranslation()
   const [showTopUpModal, setShowTopUpModal] = useState(false)
   const [showTariffInfo, setShowTariffInfo] = useState(false)
   const [promoCode, setPromoCode] = useState('')
@@ -32,6 +34,8 @@ export default function Dashboard() {
   const [promoLoading, setPromoLoading] = useState(false)
 
   const strip = topStrip && topStrip.length ? topStrip : topUsers
+
+  const getTariffKey = (tariff) => String(tariff?.name || '').trim().toLowerCase()
 
   // Trigger a subtle pulse when WS updates the strip balances
   const stripSig = (topStrip || []).map((u) => `${u.id}:${u.balance}`).join('|')
@@ -47,7 +51,8 @@ export default function Dashboard() {
         balance={user?.balance || 0} 
         avatarUrl={user?.avatar_url}
         avatarName={user?.first_name || user?.username || 'U'}
-        onDeposit={() => setShowTopUpModal(true)} 
+        onDeposit={() => setShowTopUpModal(true)}
+        onAvatarClick={onAvatarClick}
       />
 
       {/* Top Users Infinite Marquee */}
@@ -97,7 +102,7 @@ export default function Dashboard() {
       <section className="space-y-3">
         <div className="flex items-center gap-2 text-base font-semibold">
           <Wifi className="h-5 w-5 text-[var(--color-primary)]" />
-          Live транзакции
+          {t('dashboard.liveTransactions')}
         </div>
         <div className="space-y-2">
           <AnimatePresence initial={false} mode="popLayout">
@@ -124,7 +129,13 @@ export default function Dashboard() {
                     />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold">{tx.title}</p>
+                    <p className="text-sm font-semibold">
+                      {tx.type === 'deposit'
+                        ? t('dashboard.depositTitle')
+                        : tx.type === 'withdraw'
+                          ? t('dashboard.withdrawalTitle')
+                          : tx.title}
+                    </p>
                     <p className="text-xs text-sub">{tx.hash_code}</p>
                   </div>
                 </div>
@@ -147,10 +158,10 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-base font-semibold">
             <Gift className="h-5 w-5 text-[var(--color-primary)]" />
-            Тарифы компании
+            {t('dashboard.tariffs')}
           </div>
           <button type="button" className="text-xs text-sub" onClick={() => setShowTariffInfo(true)}>
-            Подробнее <ChevronRight className="inline h-3 w-3" />
+            {t('dashboard.moreDetails')} <ChevronRight className="inline h-3 w-3" />
           </button>
         </div>
         <div className="grid gap-3">
@@ -168,7 +179,14 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold">{tariff.name}</p>
-                  <p className="text-xs text-sub">{tariff.label}</p>
+                  <p className="text-xs text-sub">
+                    {(() => {
+                      const k = getTariffKey(tariff)
+                      const key = `tariffs.${k}.desc`
+                      const v = t(key)
+                      return v === key ? tariff.label : v
+                    })()}
+                  </p>
                 </div>
                 <div 
                   className="rounded-full px-3 py-1 text-sm font-semibold"
@@ -181,7 +199,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <p className="mt-3 text-xs text-sub">
-                от {formatAmount(tariff.min_amount, { maximumFractionDigits: 0, minimumFractionDigits: 0 })} до {formatAmount(tariff.max_amount, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
+                {t('common.from')} {formatAmount(tariff.min_amount, { maximumFractionDigits: 0, minimumFractionDigits: 0 })} {t('common.to')} {formatAmount(tariff.max_amount, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
               </p>
             </motion.div>
           ))}
@@ -196,9 +214,9 @@ export default function Dashboard() {
       >
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-sm font-semibold">Активируй промокод</p>
+            <p className="text-sm font-semibold">{t('dashboard.enterPromo')}</p>
             <p className="text-xs text-sub">
-              Получай бонусы и повышенный кэшбэк
+              {t('toasts.promoSuccess')}
             </p>
           </div>
           <Sparkles className="h-6 w-6 text-[var(--color-primary)]" />
@@ -207,7 +225,7 @@ export default function Dashboard() {
           <input
             value={promoCode}
             onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-            placeholder="Введите промокод"
+            placeholder={t('dashboard.enterPromo')}
             className="h-11 flex-1 rounded-full bg-[var(--color-bg-base)] px-4 text-sm text-[var(--color-text-main)] outline-none ring-1 ring-white/10 focus:ring-[var(--color-primary)]"
           />
           <LiquidGlassButton
@@ -217,16 +235,16 @@ export default function Dashboard() {
               setPromoLoading(true)
               try {
                 const res = await activatePromo(promoCode)
-                toast.success(`Начислено +${formatAmount(res?.amount || 0, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}`, res?.message || 'Промокод активирован')
+                toast.success(`${t('dashboard.credited')} +${formatAmount(res?.amount || 0, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}`, res?.message || t('toasts.promoSuccess'))
                 setPromoCode('')
               } catch (e) {
-                toast.error(e.message, 'Ошибка')
+                toast.error(e.message, t('common.error'))
               } finally {
                 setPromoLoading(false)
               }
             }}
           >
-            {promoLoading ? '...' : 'Принять'}
+            {promoLoading ? '...' : t('dashboard.activate')}
           </LiquidGlassButton>
         </div>
       </motion.section>
@@ -237,7 +255,7 @@ export default function Dashboard() {
       <Modal
         isOpen={showTariffInfo}
         onClose={() => setShowTariffInfo(false)}
-        title="Как работают тарифы"
+        title={t('modals.tariffInfo.title')}
       >
         <div className="space-y-3 text-sm text-[var(--color-text-main)]">
           <div className="card-surface p-4">

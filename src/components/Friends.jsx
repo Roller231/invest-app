@@ -15,9 +15,11 @@ import Header from './ui/Header'
 import LiquidGlassButton from './ui/LiquidGlassButton'
 import SupportSection from './ui/SupportSection'
 import { useApp } from '../context/AppContext'
+import { useTranslation } from '../i18n'
 
-export default function Friends() {
+export default function Friends({ onAvatarClick }) {
   const { user, getReferralStats, formatAmount, currency } = useApp()
+  const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
   const [refStats, setRefStats] = useState(null)
 
@@ -64,6 +66,7 @@ export default function Friends() {
         balance={user?.balance || 0}
         avatarUrl={user?.avatar_url}
         avatarName={user?.first_name || user?.username || 'U'}
+        onAvatarClick={onAvatarClick}
       />
 
       {/* Main Referral Block */}
@@ -74,9 +77,7 @@ export default function Friends() {
       >
         <div className="text-center mb-4">
           <h2 className="text-lg font-bold">
-            Приглашайте партнеров по ссылке,
-            <br />
-            получайте до <span className="text-[var(--color-primary)]">20%</span> с депозитов
+            {t('friends.howItWorksDesc')}
           </h2>
         </div>
 
@@ -89,7 +90,7 @@ export default function Friends() {
             icon={Share2}
             onClick={shareLink}
           >
-            Пригласить друзей
+            {t('friends.inviteFriend')}
           </LiquidGlassButton>
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -108,7 +109,7 @@ export default function Friends() {
         {/* Referral Link */}
         <div className="rounded-2xl bg-[var(--color-bg-base)] p-4">
           <p className="text-xs text-[var(--color-text-sub)] mb-2">
-            Скопировать реферальную ссылку
+            {t('friends.copyLink')}
           </p>
           <p className="text-sm font-medium break-all">{referralLink}</p>
         </div>
@@ -118,7 +119,7 @@ export default function Friends() {
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-[var(--color-primary)]" />
-          <p className="text-sm font-semibold">Статистика</p>
+          <p className="text-sm font-semibold">{t('profile.statistics')}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -128,7 +129,7 @@ export default function Friends() {
             className="card-surface p-4 text-center"
           >
             <p className="text-3xl font-bold">{stats.partners}</p>
-            <p className="text-sm text-[var(--color-text-sub)]">Партнеров</p>
+            <p className="text-sm text-[var(--color-text-sub)]">{t('friends.partners')}</p>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -137,7 +138,7 @@ export default function Friends() {
             className="card-surface p-4 text-center"
           >
             <p className="text-3xl font-bold">{formatAmount(stats.earned, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}</p>
-            <p className="text-sm text-[var(--color-text-sub)]">Заработано</p>
+            <p className="text-sm text-[var(--color-text-sub)]">{t('friends.earned')}</p>
           </motion.div>
         </div>
 
@@ -145,28 +146,28 @@ export default function Friends() {
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3">
               <Zap className="h-5 w-5 text-[var(--color-primary)]" />
-              <span className="text-sm">Активных партнеров:</span>
+              <span className="text-sm">{t('friends.partners')}:</span>
             </div>
             <span className="font-bold">{stats.activePartners}</span>
           </div>
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3">
               <Users className="h-5 w-5 text-[var(--color-green)]" />
-              <span className="text-sm">Партнеров 1 уровня:</span>
+              <span className="text-sm">{t('friends.level')} 1:</span>
             </div>
             <span className="font-bold">{stats.level1Partners}</span>
           </div>
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3">
               <Users className="h-5 w-5 text-[var(--color-primary)]" />
-              <span className="text-sm">Партнеров 2-3 уровня:</span>
+              <span className="text-sm">{t('friends.level')} 2-3:</span>
             </div>
             <span className="font-bold">{stats.level23Partners}</span>
           </div>
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3">
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-red)] text-xs font-bold text-white">{currency === 'USD' ? '$' : '₽'}</span>
-              <span className="text-sm">Всего пополнено:</span>
+              <span className="text-sm">{t('friends.deposited')}:</span>
             </div>
             <span className="font-bold">{formatAmount(stats.totalDeposited, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}</span>
           </div>
@@ -177,12 +178,12 @@ export default function Friends() {
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <Award className="h-4 w-4 text-[var(--color-primary)]" />
-          <p className="text-sm font-semibold">Партнерские уровни:</p>
+          <p className="text-sm font-semibold">{t('friends.referralLevels')}:</p>
         </div>
 
         <div className="card-surface p-4">
           <p className="text-xs text-[var(--color-text-sub)] mb-4">
-            Начисление происходит за каждое пополнение депозита вашего партнера/реферала на разных уровнях
+            {t('friends.howItWorksDesc')}
           </p>
 
           <div className="relative">
@@ -198,9 +199,9 @@ export default function Friends() {
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-bg-base)] border-2 border-[var(--color-text-sub)]">
                     <Users className="h-8 w-8 text-[var(--color-text-sub)]" />
                   </div>
-                  <p className="mt-2 text-sm font-bold">1 уровень</p>
+                  <p className="mt-2 text-sm font-bold">{t('friends.level')} 1</p>
                   <p className="text-lg font-bold text-[var(--color-green)]">+20%</p>
-                  <p className="text-xs text-[var(--color-text-sub)]">от пополнения депозита</p>
+                  <p className="text-xs text-[var(--color-text-sub)]">{t('friends.fromDeposits')}</p>
                 </motion.div>
               </div>
 
@@ -214,10 +215,10 @@ export default function Friends() {
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <Users className="h-4 w-4 text-[var(--color-text-sub)]" />
-                    <span className="text-sm font-medium">2 уровень</span>
+                    <span className="text-sm font-medium">{t('friends.level')} 2</span>
                   </div>
                   <p className="text-lg font-bold text-[var(--color-primary)]">+7%</p>
-                  <p className="text-xs text-[var(--color-text-sub)]">от пополнения депозита</p>
+                  <p className="text-xs text-[var(--color-text-sub)]">{t('friends.fromDeposits')}</p>
                 </motion.div>
 
                 <motion.div
@@ -228,10 +229,10 @@ export default function Friends() {
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <Users className="h-4 w-4 text-[var(--color-text-sub)]" />
-                    <span className="text-sm font-medium">3 уровень</span>
+                    <span className="text-sm font-medium">{t('friends.level')} 3</span>
                   </div>
                   <p className="text-lg font-bold text-[var(--color-primary)]">+4%</p>
-                  <p className="text-xs text-[var(--color-text-sub)]">от пополнения депозита</p>
+                  <p className="text-xs text-[var(--color-text-sub)]">{t('friends.fromDeposits')}</p>
                 </motion.div>
               </div>
             </div>

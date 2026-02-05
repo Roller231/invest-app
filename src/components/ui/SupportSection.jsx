@@ -1,15 +1,17 @@
 import { motion } from 'framer-motion'
 import LiquidGlassButton from './LiquidGlassButton'
 import CryptoIcons from './CryptoIcons'
+import { useTranslation } from '../../i18n'
 
 export default function SupportSection({ showTransferButton = true }) {
+  const { t } = useTranslation()
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2 text-lg font-semibold">
         <span className="text-[var(--color-primary)]">BINANCE</span>
       </div>
 
-      <p className="text-sm text-[var(--color-text-sub)]">Информация</p>
+      <p className="text-sm text-[var(--color-text-sub)]">{t('dashboard.support')}</p>
 
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -24,13 +26,13 @@ export default function SupportSection({ showTransferButton = true }) {
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <p className="font-semibold">Поддержка</p>
+              <p className="font-semibold">{t('dashboard.support')}</p>
               <span className="rounded-full bg-[var(--color-green)] px-2 py-0.5 text-xs font-bold text-white">
                 24/7
               </span>
             </div>
             <p className="mt-1 text-sm text-[var(--color-text-sub)]">
-              Свяжитесь с нами, если у вас остались вопросы
+              {t('dashboard.supportDesc')}
             </p>
           </div>
         </div>
@@ -41,7 +43,7 @@ export default function SupportSection({ showTransferButton = true }) {
           className="mt-4"
           onClick={() => window.open('https://t.me/support', '_blank')}
         >
-          Обратиться в поддержку
+          {t('dashboard.contactSupport')}
         </LiquidGlassButton>
       </motion.div>
 
@@ -50,7 +52,7 @@ export default function SupportSection({ showTransferButton = true }) {
       </div>
 
       <p className="text-center text-xs text-[var(--color-text-sub)]">
-        © 2026 BINANCE. Все права защищены.
+        © 2026 BINANCE. {t('footer.rightsReserved')}
       </p>
     </div>
   )

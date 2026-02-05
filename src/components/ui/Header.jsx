@@ -11,6 +11,7 @@ export default function Header({
   showBack = false, 
   onBack,
   onDeposit,
+  onAvatarClick,
   showMenu = true 
 }) {
   const [showTopUpModal, setShowTopUpModal] = useState(false)
@@ -82,7 +83,12 @@ export default function Header({
             <Plus className="h-5 w-5 text-[var(--color-primary-text)]" />
           </motion.button>
 
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-red-500 to-red-700 overflow-hidden">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onAvatarClick}
+            className="h-10 w-10 rounded-full bg-gradient-to-br from-red-500 to-red-700 overflow-hidden"
+          >
             {avatarUrl && !avatarFailed ? (
               <img
                 src={avatarUrl}
@@ -95,7 +101,7 @@ export default function Header({
                 {(avatarName || 'U').charAt(0).toUpperCase()}
               </div>
             )}
-          </div>
+          </motion.button>
         </div>
       </motion.header>
 

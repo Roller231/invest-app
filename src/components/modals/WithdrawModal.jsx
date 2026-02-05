@@ -4,6 +4,7 @@ import { CheckCircle, Wallet } from 'lucide-react'
 import Modal from '../ui/Modal'
 import LiquidGlassButton from '../ui/LiquidGlassButton'
 import { useApp } from '../../context/AppContext'
+import { useTranslation } from '../../i18n'
 
 const banks = [
   { id: 'sber', label: 'Сбербанк', color: '#21A038' },
@@ -16,6 +17,7 @@ const banks = [
 
 export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
   const { createWithdraw, formatAmount } = useApp()
+  const { t } = useTranslation()
   const [selectedBank, setSelectedBank] = useState(null)
   const [amount, setAmount] = useState('')
   const [phone, setPhone] = useState('+7')
@@ -44,7 +46,7 @@ export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
     try {
       const withdrawAmount = parseFloat(amount)
       if (withdrawAmount > balance) {
-        throw new Error('Недостаточно средств')
+        throw new Error(t('toasts.insufficientBalance'))
       }
       await createWithdraw(withdrawAmount)
       setStep(2)
@@ -65,12 +67,12 @@ export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title={step === 1 ? 'Вывод средств' : 'Успешно!'}>
+    <Modal isOpen={isOpen} onClose={handleClose} title={step === 1 ? t('modals.withdraw.title') : t('modals.withdraw.success')}>
       {step === 1 ? (
         <div className="space-y-5">
           {/* Balance Display */}
           <div className="rounded-2xl bg-[var(--color-bg-base)] p-4 text-center">
-            <p className="text-sm text-[var(--color-text-sub)]">Доступно для вывода</p>
+            <p className="text-sm text-[var(--color-text-sub)]">{t('modals.withdraw.yourBalance')}</p>
             <p className="text-2xl font-bold text-[var(--color-primary)]">
               {formatAmount(balance, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}
             </p>
@@ -79,7 +81,7 @@ export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
           {/* Bank Selection */}
           <div>
             <p className="mb-3 text-sm font-medium text-[var(--color-text-sub)]">
-              Выберите банк
+              {t('modals.withdraw.walletAddress')}
             </p>
             <div className="grid grid-cols-3 gap-2">
               {banks.map((bank) => (
@@ -107,7 +109,7 @@ export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
           {/* Amount Input */}
           <div>
             <p className="mb-2 text-sm font-medium text-[var(--color-text-sub)]">
-              Сумма вывода
+              {t('modals.withdraw.enterAmount')}
             </p>
             <input
               type="number"
@@ -121,7 +123,7 @@ export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
           {/* Phone Input */}
           <div>
             <p className="mb-2 text-sm font-medium text-[var(--color-text-sub)]">
-              Номер телефона
+              {t('modals.topUp.phoneNumber')}
             </p>
             <input
               type="tel"
@@ -135,7 +137,7 @@ export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
           {/* Card Number Input */}
           <div>
             <p className="mb-2 text-sm font-medium text-[var(--color-text-sub)]">
-              Номер карты
+              {t('modals.topUp.cardNumber')}
             </p>
             <input
               type="text"
@@ -159,7 +161,7 @@ export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
             onClick={handleSubmit}
             disabled={!selectedBank || !amount || !cardNumber || loading}
           >
-            {loading ? 'Обработка...' : 'Готово'}
+            {loading ? t('modals.withdraw.processing') : t('modals.withdraw.withdrawBtn')}
           </LiquidGlassButton>
         </div>
       ) : (
@@ -177,9 +179,9 @@ export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
           </motion.div>
           
           <div>
-            <h3 className="text-xl font-bold">Успешно!</h3>
+            <h3 className="text-xl font-bold">{t('modals.withdraw.success')}</h3>
             <p className="mt-2 text-sm text-[var(--color-text-sub)]">
-              Запрос на вывод {formatAmount(parseInt(amount) || 0, { maximumFractionDigits: 0, minimumFractionDigits: 0 })} создан
+              {t('modals.withdraw.successDesc')} {formatAmount(parseInt(amount) || 0, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
             </p>
           </div>
 
@@ -209,7 +211,7 @@ export default function WithdrawModal({ isOpen, onClose, balance = 0 }) {
             size="lg"
             onClick={handleClose}
           >
-            Понятно
+            {t('common.confirm')}
           </LiquidGlassButton>
         </motion.div>
       )}

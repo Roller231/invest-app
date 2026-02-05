@@ -12,8 +12,10 @@ import {
 import Modal from '../ui/Modal'
 import LiquidGlassButton from '../ui/LiquidGlassButton'
 import api from '../../api/client'
+import { useTranslation } from '../../i18n'
 
 export default function TopUpModal({ isOpen, onClose }) {
+  const { t } = useTranslation()
   const [requisites, setRequisites] = useState([])
   const [loading, setLoading] = useState(true)
   const [copiedId, setCopiedId] = useState(null)
@@ -68,7 +70,7 @@ export default function TopUpModal({ isOpen, onClose }) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Пополнение баланса">
+    <Modal isOpen={isOpen} onClose={handleClose} title={t('modals.topUp.title')}>
       <div className="space-y-5">
         {/* Instructions */}
         <div className="rounded-2xl bg-gradient-to-br from-[var(--color-primary)]/10 to-transparent p-4 space-y-3">
@@ -77,8 +79,8 @@ export default function TopUpModal({ isOpen, onClose }) {
               1
             </div>
             <div>
-              <p className="font-medium text-sm">Выберите способ оплаты</p>
-              <p className="text-xs text-[var(--color-text-sub)]">Карта или СБП</p>
+              <p className="font-medium text-sm">{t('modals.topUp.step1')}</p>
+              <p className="text-xs text-[var(--color-text-sub)]">{t('modals.topUp.step1Desc')}</p>
             </div>
           </div>
           
@@ -87,8 +89,8 @@ export default function TopUpModal({ isOpen, onClose }) {
               2
             </div>
             <div>
-              <p className="font-medium text-sm">Переведите нужную сумму</p>
-              <p className="text-xs text-[var(--color-text-sub)]">По указанным реквизитам</p>
+              <p className="font-medium text-sm">{t('modals.topUp.step2')}</p>
+              <p className="text-xs text-[var(--color-text-sub)]">{t('modals.topUp.step2Desc')}</p>
             </div>
           </div>
           
@@ -97,8 +99,8 @@ export default function TopUpModal({ isOpen, onClose }) {
               3
             </div>
             <div>
-              <p className="font-medium text-sm">Напишите менеджеру</p>
-              <p className="text-xs text-[var(--color-text-sub)]">Отправьте скриншот оплаты</p>
+              <p className="font-medium text-sm">{t('modals.topUp.step3')}</p>
+              <p className="text-xs text-[var(--color-text-sub)]">{t('modals.topUp.step3Desc')}</p>
             </div>
           </div>
           
@@ -107,29 +109,29 @@ export default function TopUpModal({ isOpen, onClose }) {
               ✓
             </div>
             <div>
-              <p className="font-medium text-sm">Получите пополнение</p>
-              <p className="text-xs text-[var(--color-text-sub)]">Обычно в течение 5-15 минут</p>
+              <p className="font-medium text-sm">{t('modals.topUp.step4')}</p>
+              <p className="text-xs text-[var(--color-text-sub)]">{t('modals.topUp.step4Desc')}</p>
             </div>
           </div>
         </div>
 
         {/* Requisites List */}
         <div className="space-y-3">
-          <p className="text-sm font-medium text-[var(--color-text-sub)]">Реквизиты для оплаты</p>
+          <p className="text-sm font-medium text-[var(--color-text-sub)]">{t('modals.topUp.requisites')}</p>
           
           {loading ? (
             <div className="py-8 text-center text-[var(--color-text-sub)]">
               <div className="animate-spin h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full mx-auto mb-2" />
-              <p className="text-sm">Загрузка...</p>
+              <p className="text-sm">{t('common.loading')}</p>
             </div>
           ) : requisites.length === 0 ? (
             <div className="py-8 text-center">
               <AlertCircle className="h-12 w-12 mx-auto mb-3 text-[var(--color-text-sub)] opacity-50" />
               <p className="text-sm text-[var(--color-text-sub)]">
-                Реквизиты временно недоступны
+                {t('modals.topUp.noRequisites')}
               </p>
               <p className="text-xs text-[var(--color-text-sub)] mt-1">
-                Свяжитесь с менеджером
+                {t('modals.topUp.contactManager')}
               </p>
             </div>
           ) : (
@@ -179,13 +181,13 @@ export default function TopUpModal({ isOpen, onClose }) {
                       {/* Details */}
                       <div className="rounded-xl bg-[var(--color-bg-card)] p-3">
                         <p className="text-xs text-[var(--color-text-sub)] mb-1">
-                          {req.type === 'card' ? 'Номер карты' : req.type === 'sbp' ? 'Номер телефона' : 'Реквизиты'}
+                          {req.type === 'card' ? t('modals.topUp.cardNumber') : req.type === 'sbp' ? t('modals.topUp.phoneNumber') : t('modals.topUp.requisites')}
                         </p>
                         <div className="flex items-center justify-between">
                           <p className="font-mono font-bold text-lg">{req.details}</p>
                           <button
                             onClick={() => copyToClipboard(req.details, req.id)}
-                            aria-label={copiedId === req.id ? 'Скопировано' : 'Копировать'}
+                            aria-label={copiedId === req.id ? t('common.copied') : t('common.copy')}
                             className="flex items-center justify-center text-[var(--color-primary)]"
                           >
                             {copiedId === req.id ? (
@@ -200,7 +202,7 @@ export default function TopUpModal({ isOpen, onClose }) {
                       {/* Holder name */}
                       {req.holder_name && (
                         <div className="rounded-xl bg-[var(--color-bg-card)] p-3">
-                          <p className="text-xs text-[var(--color-text-sub)] mb-1">Получатель</p>
+                          <p className="text-xs text-[var(--color-text-sub)] mb-1">{t('modals.topUp.recipient')}</p>
                           <p className="font-medium">{req.holder_name}</p>
                         </div>
                       )}
@@ -220,15 +222,14 @@ export default function TopUpModal({ isOpen, onClose }) {
           icon={MessageCircle}
           onClick={openTelegramSupport}
         >
-          Написать менеджеру
+          {t('modals.topUp.writeManager')}
         </LiquidGlassButton>
 
         {/* Warning */}
         <div className="flex items-start gap-2 text-xs text-[var(--color-text-sub)]">
           <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
           <p>
-            После оплаты обязательно отправьте скриншот менеджеру для подтверждения. 
-            Баланс будет пополнен в течение 5-15 минут.
+            {t('modals.topUp.warning')}
           </p>
         </div>
       </div>

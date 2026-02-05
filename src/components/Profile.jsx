@@ -13,7 +13,7 @@ import {
   HelpCircle,
   Play
 } from 'lucide-react'
-import { marketTrends, faqItems } from '../data.js'
+import { marketTrends } from '../data.js'
 import Header from './ui/Header'
 import LiquidGlassButton from './ui/LiquidGlassButton'
 import SupportSection from './ui/SupportSection'
@@ -24,10 +24,12 @@ import TradingSimulationModal from './modals/TradingSimulationModal'
 import { useApp } from '../context/AppContext'
 import { useToast } from './ui/ToastProvider.jsx'
 import { api } from '../api'
+import { useTranslation } from '../i18n'
 
-export default function Profile() {
+export default function Profile({ onAvatarClick }) {
   const { user, stats, tariffs, activeDeposit, toggleAutoReinvest, collectAccumulated, reinvest, withdrawDeposit, refreshUser, processPayouts, formatAmount } = useApp()
   const toast = useToast()
+  const { t } = useTranslation()
   const [showDepositModal, setShowDepositModal] = useState(false)
   const [showWithdrawDepositModal, setShowWithdrawDepositModal] = useState(false)
   const [showTradingModal, setShowTradingModal] = useState(false)
@@ -43,6 +45,15 @@ export default function Profile() {
   const currentTariff = tariffs?.find(t => t.name === stats?.current_tariff_name) || tariffs?.[0]
   const nextTariff = tariffs?.find(t => t.name === stats?.next_tariff_name)
   const amountToNextTariff = stats?.amount_to_next_tariff || 0
+
+  const getTariffKey = (tariff) => String(tariff?.name || '').trim().toLowerCase()
+
+  const getTariffDesc = (tariff) => {
+    const k = getTariffKey(tariff)
+    const key = `tariffs.${k}.desc`
+    const v = t(key)
+    return v === key ? tariff?.label : v
+  }
 
   // Calculate time left until next payout using server-provided seconds
   const timeToPayoutRef = useRef(stats?.time_to_next_payout || 0)
@@ -134,12 +145,21 @@ export default function Profile() {
 
   const formatTime = (num) => num.toString().padStart(2, '0')
 
+  const faqItems = [
+    { id: 1, question: t('faq.q1'), answer: t('faq.a1') },
+    { id: 2, question: t('faq.q2'), answer: t('faq.a2') },
+    { id: 3, question: t('faq.q3'), answer: t('faq.a3') },
+    { id: 4, question: t('faq.q4'), answer: t('faq.a4') },
+    { id: 5, question: t('faq.q5'), answer: t('faq.a5') },
+  ]
+
   return (
     <div className="space-y-6">
       <Header
         balance={user?.balance || 0}
         avatarUrl={user?.avatar_url}
         avatarName={user?.first_name || user?.username || 'U'}
+        onAvatarClick={onAvatarClick}
       />
 
       <motion.section 
@@ -150,7 +170,7 @@ export default function Profile() {
         <div className="bg-gradient-to-br from-[var(--color-primary)]/20 via-transparent to-transparent p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-sm text-[var(--color-text-sub)]">Активный вклад</p>
+              <p className="text-sm text-[var(--color-text-sub)]">{t('profile.activeDeposit')}</p>
               <div className="flex items-center gap-2 mt-1">
                 <span 
                   className="text-xs px-2 py-0.5 rounded-full"
@@ -159,10 +179,10 @@ export default function Profile() {
                     color: currentTariff?.color || 'var(--color-primary)'
                   }}
                 >
-                  {currentTariff?.name || 'Нет тарифа'}
+                  {currentTariff?.name || t('profile.currentTariff')}
                 </span>
                 <span className="text-xs text-[var(--color-green)]">
-                  +{currentTariff?.daily_percent || 0}% в день
+                  +{currentTariff?.daily_percent || 0}% {t('common.perDay')}
                 </span>
               </div>
             </div>
@@ -180,7 +200,7 @@ export default function Profile() {
           {deposit > 0 && stats?.time_to_next_payout > 0 && (
             <div className="mt-4 flex items-center gap-3">
               <Timer className="h-4 w-4 text-[var(--color-text-sub)]" />
-              <span className="text-sm text-[var(--color-text-sub)]">До начисления:</span>
+              <span className="text-sm text-[var(--color-text-sub)]">{t('profile.dailyProfit')}:</span>
               <div className="flex gap-1 font-mono text-lg">
                 <span className="rounded bg-[var(--color-bg-base)] px-2 py-1">
                   {formatTime(timeLeft.hours)}
@@ -199,13 +219,13 @@ export default function Profile() {
 
           <div className="mt-4 grid grid-cols-2 gap-3">
             <div className="rounded-2xl bg-[var(--color-bg-base)] p-3">
-              <p className="text-xs text-[var(--color-text-sub)]">Накоплено</p>
+              <p className="text-xs text-[var(--color-text-sub)]">{t('profile.accumulated')}</p>
               <p className="text-lg font-bold text-[var(--color-primary)]">
                 {formatAmount(accumulated, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}
               </p>
             </div>
             <div className="rounded-2xl bg-[var(--color-bg-base)] p-3">
-              <p className="text-xs text-[var(--color-text-sub)]">Всего заработано</p>
+              <p className="text-xs text-[var(--color-text-sub)]">{t('profile.totalEarned')}</p>
               <p className="text-lg font-bold text-[var(--color-green)]">
                 +{formatAmount(profit, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}
               </p>
@@ -224,15 +244,15 @@ export default function Profile() {
                 setLoading(true)
                 try {
                   const result = await reinvest()
-                  toast.success(`Новый вклад: ${formatAmount(result.new_deposit_amount || 0, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}`, 'Реинвест выполнен')
+                  toast.success(`${formatAmount(result.new_deposit_amount || 0, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}`, t('toasts.reinvestSuccess'))
                 } catch (e) {
-                  toast.error(e.message, 'Ошибка')
+                  toast.error(e.message, t('common.error'))
                 } finally {
                   setLoading(false)
                 }
               }}
             >
-              Реинвест
+              {t('profile.reinvest')}
             </LiquidGlassButton>
             <LiquidGlassButton
               variant="success"
@@ -243,15 +263,15 @@ export default function Profile() {
                 setLoading(true)
                 try {
                   const result = await collectAccumulated()
-                  toast.success(`+${formatAmount(result.collected || 0, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`, 'Переведено на баланс')
+                  toast.success(`+${formatAmount(result.collected || 0, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`, t('toasts.collectSuccess'))
                 } catch (e) {
-                  toast.error(e.message, 'Ошибка')
+                  toast.error(e.message, t('common.error'))
                 } finally {
                   setLoading(false)
                 }
               }}
             >
-              Собрать
+              {t('profile.collect')}
             </LiquidGlassButton>
           </div>
 
@@ -263,7 +283,7 @@ export default function Profile() {
               try {
                 await toggleAutoReinvest()
               } catch (e) {
-                toast.error(e.message, 'Ошибка')
+                toast.error(e.message, t('common.error'))
               }
             }}
             className={`flex w-full items-center justify-between rounded-2xl bg-[var(--color-bg-base)] p-4 ${deposit <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -271,8 +291,8 @@ export default function Profile() {
             <div className="flex items-center gap-3">
               <RefreshCw className={`h-5 w-5 ${user?.auto_reinvest ? 'text-[var(--color-green)]' : 'text-[var(--color-text-sub)]'}`} />
               <div>
-                <span className="font-medium">Авто реинвест</span>
-                <p className="text-xs text-[var(--color-text-sub)]">Автоматически каждые 24ч</p>
+                <span className="font-medium">{t('profile.autoReinvest')}</span>
+                <p className="text-xs text-[var(--color-text-sub)]">{t('common.perDay')}</p>
               </div>
             </div>
             {user?.auto_reinvest ? (
@@ -291,7 +311,7 @@ export default function Profile() {
               setShowWithdrawDepositModal(true)
             }}
           >
-            Вывести вклад
+            {t('profile.withdrawDeposit')}
           </LiquidGlassButton>
 
           <LiquidGlassButton
@@ -301,7 +321,7 @@ export default function Profile() {
             icon={TrendingUp}
             onClick={() => setShowDepositModal(true)}
           >
-            Инвестировать
+            {t('modals.deposit.invest')}
           </LiquidGlassButton>
 
           <motion.button
@@ -319,8 +339,8 @@ export default function Profile() {
                 <Play className="h-5 w-5 text-[var(--color-primary)]" />
               </div>
               <div className="text-left">
-                <p className="font-semibold text-sm">Торговый терминал</p>
-                <p className="text-xs text-[var(--color-text-sub)]">Смотреть процесс торговли</p>
+                <p className="font-semibold text-sm">{t('profile.simulation')}</p>
+                <p className="text-xs text-[var(--color-text-sub)]">{t('profile.howItWorks')}</p>
               </div>
             </div>
             <ChevronRight className="h-5 w-5 text-[var(--color-text-sub)]" />
@@ -332,7 +352,7 @@ export default function Profile() {
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-[var(--color-primary)]" />
-          <p className="text-sm font-semibold">Тарифные планы</p>
+          <p className="text-sm font-semibold">{t('dashboard.tariffs')}</p>
         </div>
 
         {/* Tariff Tabs */}
@@ -345,7 +365,7 @@ export default function Profile() {
                 : 'text-[var(--color-text-sub)]'
             }`}
           >
-            Текущий тариф
+            {t('profile.currentTariff')}
           </button>
           <button
             onClick={() => setActiveTariffTab('next')}
@@ -355,7 +375,7 @@ export default function Profile() {
                 : 'text-[var(--color-text-sub)]'
             }`}
           >
-            Следующий тариф
+            {t('common.next')}
           </button>
         </div>
 
@@ -370,8 +390,8 @@ export default function Profile() {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-lg">{currentTariff?.name || 'Нет тарифа'}</p>
-                  <p className="text-xs text-[var(--color-text-sub)]">{currentTariff?.label}</p>
+                  <p className="font-bold text-lg">{currentTariff?.name || t('profile.currentTariff')}</p>
+                  <p className="text-xs text-[var(--color-text-sub)]">{getTariffDesc(currentTariff)}</p>
                 </div>
                 <div 
                   className="rounded-full px-4 py-2 text-lg font-bold"
@@ -381,7 +401,7 @@ export default function Profile() {
                 </div>
               </div>
               <div className="mt-4 rounded-2xl bg-[var(--color-bg-base)] p-3">
-                <p className="text-xs text-[var(--color-text-sub)]">Ваш депозит</p>
+                <p className="text-xs text-[var(--color-text-sub)]">{t('profile.activeDeposit')}</p>
                 <p className="font-semibold">{formatAmount(deposit, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}</p>
               </div>
             </motion.div>
@@ -395,8 +415,10 @@ export default function Profile() {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-lg">{nextTariff?.name || 'Максимальный тариф'}</p>
-                  <p className="text-xs text-[var(--color-text-sub)]">{nextTariff?.label || 'Вы достигли максимума'}</p>
+                  <p className="font-bold text-lg">{nextTariff?.name || t('common.max')}</p>
+                  {nextTariff && (
+                    <p className="text-xs text-[var(--color-text-sub)]">{getTariffDesc(nextTariff)}</p>
+                  )}
                 </div>
                 <div 
                   className="rounded-full px-4 py-2 text-lg font-bold"
@@ -406,7 +428,7 @@ export default function Profile() {
                 </div>
               </div>
               <div className="mt-4 rounded-2xl bg-[var(--color-bg-base)] p-3">
-                <p className="text-xs text-[var(--color-text-sub)]">До следующего тарифа</p>
+                <p className="text-xs text-[var(--color-text-sub)]">{t('common.next')}</p>
                 <p className="font-semibold text-[var(--color-primary)]">
                   {formatAmount(amountToNextTariff, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
                 </p>
@@ -434,7 +456,7 @@ export default function Profile() {
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-[var(--color-primary)]" />
-          <p className="text-sm font-semibold">В тренде</p>
+          <p className="text-sm font-semibold">{t('profile.marketRates')}</p>
         </div>
 
         <RatesWidget items={ratesWidgetItems} />
@@ -444,7 +466,7 @@ export default function Profile() {
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <HelpCircle className="h-4 w-4 text-[var(--color-primary)]" />
-          <p className="text-sm font-semibold">FAQ</p>
+          <p className="text-sm font-semibold">{t('profile.faq')}</p>
         </div>
 
         <div className="space-y-2">

@@ -1,15 +1,18 @@
 import { motion } from 'framer-motion'
 import { Home, Wallet, User, Users, LineChart } from 'lucide-react'
+import { useTranslation } from '../../i18n'
 
-const tabs = [
-  { id: 'home', label: 'Главная', Icon: Home },
-  { id: 'wallet', label: 'Кошелек', Icon: Wallet },
-  { id: 'profile', label: 'Кабинет', Icon: User },
-  { id: 'friends', label: 'Друзья', Icon: Users },
-  { id: 'market', label: 'Биржа', Icon: LineChart },
+const getNavTabs = (t) => [
+  { id: 'home', label: t('nav.home'), Icon: Home },
+  { id: 'wallet', label: t('nav.wallet'), Icon: Wallet },
+  { id: 'profile', label: t('nav.profile'), Icon: User },
+  { id: 'friends', label: t('nav.friends'), Icon: Users },
+  { id: 'market', label: t('nav.exchange'), Icon: LineChart },
 ]
 
 export default function LiquidGlassCanvas({ activeTab, onTabChange }) {
+  const { t } = useTranslation()
+  const tabs = getNavTabs(t)
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-md px-4 pb-[calc(env(safe-area-inset-bottom)+8px)]">
       <div className="apple-glass-navbar">

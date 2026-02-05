@@ -16,28 +16,36 @@ import {
 import Modal from '../ui/Modal'
 import LiquidGlassButton from '../ui/LiquidGlassButton'
 import { useApp } from '../../context/AppContext'
-
-const tradingSteps = [
-  { id: 1, text: 'Инициализация торгового модуля...', icon: Zap, duration: 800 },
-  { id: 2, text: 'Подключение к торговому серверу...', icon: Shield, duration: 1200 },
-  { id: 3, text: 'Авторизация торгового аккаунта...', icon: Wallet, duration: 900 },
-  { id: 4, text: 'Перевод депозита на торговый счёт...', icon: DollarSign, duration: 1500 },
-  { id: 5, text: 'Анализ рыночных условий...', icon: BarChart3, duration: 1100 },
-  { id: 6, text: 'Подбор оптимальной торговой пары...', icon: ArrowRightLeft, duration: 1300 },
-  { id: 7, text: 'Расчёт точки входа...', icon: Target, duration: 1000 },
-  { id: 8, text: 'Торговый счёт запущен в работу!', icon: TrendingUp, duration: 500 },
-]
+import { useTranslation } from '../../i18n'
 
 const tradingPairs = [
   'BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'BNB/USDT', 'TON/USDT', 'XRP/USDT'
 ]
 
-const strategies = [
-  'Скальпинг', 'Свинг-трейдинг', 'Арбитраж', 'Маркет-мейкинг'
-]
+const strategyKeys = ['scalping', 'swing', 'arbitrage', 'marketMaking']
 
 export default function TradingSimulationModal({ isOpen, onClose, tariff, depositAmount }) {
   const { formatAmount } = useApp()
+  const { t, language } = useTranslation()
+
+  const tradingSteps = [
+    { id: 1, text: t('modals.simulation.steps.init'), icon: Zap, duration: 800 },
+    { id: 2, text: t('modals.simulation.steps.connect'), icon: Shield, duration: 1200 },
+    { id: 3, text: t('modals.simulation.steps.auth'), icon: Wallet, duration: 900 },
+    { id: 4, text: t('modals.simulation.steps.transfer'), icon: DollarSign, duration: 1500 },
+    { id: 5, text: t('modals.simulation.steps.analyze'), icon: BarChart3, duration: 1100 },
+    { id: 6, text: t('modals.simulation.steps.pickPair'), icon: ArrowRightLeft, duration: 1300 },
+    { id: 7, text: t('modals.simulation.steps.entry'), icon: Target, duration: 1000 },
+    { id: 8, text: t('modals.simulation.steps.started'), icon: TrendingUp, duration: 500 },
+  ]
+
+  const strategies = [
+    t('modals.simulation.strategies.scalping'), 
+    t('modals.simulation.strategies.swing'), 
+    t('modals.simulation.strategies.arbitrage'), 
+    t('modals.simulation.strategies.marketMaking')
+  ]
+
   const [isRunning, setIsRunning] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   const [completedSteps, setCompletedSteps] = useState([])
@@ -80,7 +88,8 @@ export default function TradingSimulationModal({ isOpen, onClose, tariff, deposi
 
     // Random pair and strategy
     const pair = tradingPairs[Math.floor(Math.random() * tradingPairs.length)]
-    const strategy = strategies[Math.floor(Math.random() * strategies.length)]
+    const strategyKey = strategyKeys[Math.floor(Math.random() * strategyKeys.length)]
+    const strategy = t(`modals.simulation.strategies.${strategyKey}`)
     setSelectedPair(pair)
     setSelectedStrategy(strategy)
 
@@ -121,7 +130,7 @@ export default function TradingSimulationModal({ isOpen, onClose, tariff, deposi
         pair: selectedPair,
         amount,
         profit: parseFloat(profit),
-        time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        time: new Date().toLocaleTimeString(language === 'ru' ? 'ru-RU' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
       }
 
       setTrades(prev => [newTrade, ...prev].slice(0, 10))
@@ -135,23 +144,23 @@ export default function TradingSimulationModal({ isOpen, onClose, tariff, deposi
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Торговый терминал" fullScreen topOffset={95}>
+    <Modal isOpen={isOpen} onClose={onClose} title={t('modals.simulation.terminalTitle')} fullScreen topOffset={95}>
       <div className="space-y-4">
         {/* Tariff Info */}
         <div className="rounded-2xl bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-[var(--color-text-sub)]">Тариф</p>
+              <p className="text-sm text-[var(--color-text-sub)]">{t('modals.deposit.tariff')}</p>
               <p className="font-bold text-lg">{tariff?.name || 'OKX'}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-[var(--color-text-sub)]">Доходность</p>
-              <p className="font-bold text-lg text-[var(--color-primary)]">+{tariff?.daily_percent || 3.2}%/день</p>
+              <p className="text-sm text-[var(--color-text-sub)]">{t('modals.deposit.dailyPercent')}</p>
+              <p className="font-bold text-lg text-[var(--color-primary)]">+{tariff?.daily_percent || 3.2}% {t('common.perDay')}</p>
             </div>
           </div>
           {depositAmount && (
             <div className="mt-3 pt-3 border-t border-white/10">
-              <p className="text-sm text-[var(--color-text-sub)]">Сумма в работе</p>
+              <p className="text-sm text-[var(--color-text-sub)]">{t('modals.simulation.amountInWork')}</p>
               <p className="font-bold text-xl">{formatAmount(depositAmount, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}</p>
             </div>
           )}
@@ -165,8 +174,8 @@ export default function TradingSimulationModal({ isOpen, onClose, tariff, deposi
           {!isRunning && completedSteps.length === 0 && !tradingActive && (
             <div className="h-full flex flex-col items-center justify-center text-[var(--color-text-sub)]">
               <BarChart3 className="h-12 w-12 mb-3 opacity-50" />
-              <p>Нажмите "Запустить торговлю"</p>
-              <p className="text-xs mt-1">для начала работы алгоритма</p>
+              <p>{t('modals.simulation.pressStart')}</p>
+              <p className="text-xs mt-1">{t('modals.simulation.pressStartDesc')}</p>
             </div>
           )}
 
@@ -215,15 +224,15 @@ export default function TradingSimulationModal({ isOpen, onClose, tariff, deposi
                 >
                   <div className="flex items-center gap-2 text-[var(--color-text-sub)]">
                     <ArrowRightLeft className="h-4 w-4" />
-                    <span>Торговая пара: <span className="text-[var(--color-primary)] font-semibold">{selectedPair}</span></span>
+                    <span>{t('modals.simulation.pair')}: <span className="text-[var(--color-primary)] font-semibold">{selectedPair}</span></span>
                   </div>
                   <div className="flex items-center gap-2 text-[var(--color-text-sub)]">
                     <Target className="h-4 w-4" />
-                    <span>Стратегия: <span className="text-[var(--color-primary)] font-semibold">{selectedStrategy}</span></span>
+                    <span>{t('modals.simulation.strategyLabel')}: <span className="text-[var(--color-primary)] font-semibold">{selectedStrategy}</span></span>
                   </div>
                   <div className="flex items-center gap-2 text-[var(--color-text-sub)]">
                     <TrendingUp className="h-4 w-4" />
-                    <span>Ожидаемая прибыль: <span className="text-[var(--color-green)] font-semibold">+{formatAmount(profitPreview || 0, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}/день</span></span>
+                    <span>{t('modals.simulation.expectedProfitLabel')}: <span className="text-[var(--color-green)] font-semibold">+{formatAmount(profitPreview || 0, { maximumFractionDigits: 2, minimumFractionDigits: 2 })} {t('common.perDay')}</span></span>
                   </div>
                 </motion.div>
 
@@ -234,7 +243,7 @@ export default function TradingSimulationModal({ isOpen, onClose, tariff, deposi
                     animate={{ opacity: 1 }}
                     className="pt-3 mt-3 border-t border-white/10"
                   >
-                    <p className="text-xs text-[var(--color-text-sub)] mb-2">Последние сделки:</p>
+                    <p className="text-xs text-[var(--color-text-sub)] mb-2">{t('modals.simulation.lastTrades')}:</p>
                     {trades.slice(0, 5).map((trade) => (
                       <motion.div
                         key={trade.id}
@@ -268,14 +277,14 @@ export default function TradingSimulationModal({ isOpen, onClose, tariff, deposi
             disabled={isRunning}
             onClick={startTrading}
           >
-            {isRunning ? 'Запуск...' : 'Запустить торговлю'}
+            {isRunning ? t('modals.simulation.starting') : t('modals.simulation.startTrading')}
           </LiquidGlassButton>
         )}
 
         {tradingActive && (
           <div className="flex items-center justify-center gap-2 text-sm text-[var(--color-green)]">
             <div className="h-2 w-2 rounded-full bg-[var(--color-green)] animate-pulse" />
-            Торговля активна
+            {t('modals.simulation.tradingActive')}
           </div>
         )}
       </div>

@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../../context/AppContext'
+import { useTranslation } from '../../i18n'
 
 export default function RatesWidget({ items = [] }) {
   const scrollerRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const { formatAmount } = useApp()
+  const { t } = useTranslation()
 
   const normalized = useMemo(() => {
     return (items || []).map((it) => {
@@ -119,7 +121,7 @@ export default function RatesWidget({ items = [] }) {
                       </div>
                     </div>
 
-                    <div className="mt-1 text-sm text-white/45">Изменение за 24ч</div>
+                    <div className="mt-1 text-sm text-white/45">{t('rates.change24h')}</div>
                   </div>
                 </div>
               </motion.div>

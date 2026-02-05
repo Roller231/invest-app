@@ -9,13 +9,15 @@ import Header from './ui/Header'
 import LiquidGlassButton from './ui/LiquidGlassButton'
 import { useApp } from '../context/AppContext'
 import { useToast } from './ui/ToastProvider'
+import { useTranslation } from '../i18n'
 
 const ROUND_SECONDS = 6
 const CHART_POINTS = 40
 
-export default function Exchange() {
+export default function Exchange({ onAvatarClick }) {
   const { user, currency, convertAmount, convertToRub, createGameBet, createGamePayout, formatAmount } = useApp()
   const toast = useToast()
+  const { t } = useTranslation()
   const userKey = user?.id ?? user?.tg_id ?? 'dev'
   const initialBalance = useMemo(() => {
     const v = Number(user?.balance || 0)
@@ -122,7 +124,7 @@ export default function Exchange() {
       const res = await createGameBet(stake)
       if (typeof res?.new_balance === 'number') setBalance(res.new_balance)
     } catch (e) {
-      toast.error(e.message || 'Не удалось сделать ставку', 'Ошибка')
+      toast.error(e.message || t('exchange.betError'), t('common.error'))
       return
     }
     setRound({
@@ -187,16 +189,17 @@ export default function Exchange() {
         balance={balance}
         avatarUrl={user?.avatar_url}
         avatarName={user?.first_name || user?.username || 'U'}
+        onAvatarClick={onAvatarClick}
       />
 
       <section className="card-surface p-4 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs text-[var(--color-text-sub)]">Пара</p>
+            <p className="text-xs text-[var(--color-text-sub)]">{t('exchange.pair')}</p>
             <p className="text-sm font-semibold">TON/USDT</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-[var(--color-text-sub)]">Цена</p>
+            <p className="text-xs text-[var(--color-text-sub)]">{t('exchange.price')}</p>
             <p className="text-lg font-bold">{price.toFixed(5)}</p>
           </div>
         </div>
@@ -236,7 +239,7 @@ export default function Exchange() {
             disabled={round.status === 'running' || balance < 10}
             onClick={() => startRound('up')}
           >
-            Вверх
+            {t('exchange.up')}
           </LiquidGlassButton>
 
           <LiquidGlassButton
@@ -247,13 +250,13 @@ export default function Exchange() {
             disabled={round.status === 'running' || balance < 10}
             onClick={() => startRound('down')}
           >
-            Вниз
+            {t('exchange.down')}
           </LiquidGlassButton>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-2xl bg-[var(--color-bg-base)] p-3">
-            <p className="text-xs text-[var(--color-text-sub)]">Баланс игры</p>
+            <p className="text-xs text-[var(--color-text-sub)]">{t('exchange.gameBalance')}</p>
             <p className="text-lg font-bold">
               {currency === 'USD' ? '$' : '₽'}{convertAmount(Math.max(0, Math.floor(balance))).toLocaleString(currency === 'USD' ? 'en-US' : 'ru-RU', {
                 maximumFractionDigits: 0,
@@ -262,7 +265,7 @@ export default function Exchange() {
             </p>
           </div>
           <div className="rounded-2xl bg-[var(--color-bg-base)] p-3">
-            <p className="text-xs text-[var(--color-text-sub)]">Ставка</p>
+            <p className="text-xs text-[var(--color-text-sub)]">{t('exchange.bet')}</p>
             <div className="flex items-center gap-1 mt-1">
               <span className="text-lg font-bold">{currency === 'USD' ? '$' : '₽'}</span>
               <input
@@ -279,15 +282,15 @@ export default function Exchange() {
 
         <div className="flex items-center justify-between rounded-2xl bg-[var(--color-bg-base)] p-3">
           <div>
-            <p className="text-xs text-[var(--color-text-sub)]">Раунд</p>
+            <p className="text-xs text-[var(--color-text-sub)]">{t('exchange.round')}</p>
             <p className="text-sm font-semibold">
-              {round.status === 'idle' && 'Ожидание'}
-              {round.status === 'running' && 'Идёт'}
-              {round.status === 'finished' && (round.result === 'win' ? 'Победа' : 'Проигрыш')}
+              {round.status === 'idle' && t('exchange.waiting')}
+              {round.status === 'running' && t('exchange.running')}
+              {round.status === 'finished' && (round.result === 'win' ? t('exchange.win') : t('exchange.lose'))}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-[var(--color-text-sub)]">Таймер</p>
+            <p className="text-xs text-[var(--color-text-sub)]">{t('exchange.timer')}</p>
             <p className="text-sm font-semibold">{round.status === 'running' ? `${round.secondsLeft}s` : '—'}</p>
           </div>
         </div>
@@ -307,11 +310,11 @@ export default function Exchange() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold">
-                    {round.result === 'win' ? `+${formatAmount(round.payout, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}` : 'Ставка не сыграла'}
+                    {round.result === 'win' ? `+${formatAmount(round.payout, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}` : t('exchange.lose')}
                   </p>
                 </div>
                 <LiquidGlassButton variant="secondary" icon={RotateCcw} onClick={resetRound}>
-                  Ещё
+                  {t('exchange.tryAgain')}
                 </LiquidGlassButton>
               </div>
             </motion.div>
@@ -320,7 +323,7 @@ export default function Exchange() {
 
         {round.status === 'idle' && (
           <div className="text-xs text-[var(--color-text-sub)] text-center">
-            Выбери направление. Раунд длится {ROUND_SECONDS} секунд.
+            {t('exchange.round')} {ROUND_SECONDS}s
           </div>
         )}
       </section>
