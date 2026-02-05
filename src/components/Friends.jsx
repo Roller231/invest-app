@@ -77,22 +77,8 @@ export default function Friends() {
           <h2 className="text-lg font-bold">
             Приглашайте партнеров по ссылке,
             <br />
-            получайте <span className="text-[var(--color-primary)]">31%</span> с депозитов
+            получайте до <span className="text-[var(--color-primary)]">20%</span> с депозитов
           </h2>
-        </div>
-
-        {/* Total Users */}
-        <div className="flex items-center justify-center gap-2 mb-5">
-          <div className="flex -space-x-2">
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="h-8 w-8 rounded-full border-2 border-[var(--color-bg-card)] bg-gradient-to-br from-purple-400 to-pink-500"
-              />
-            ))}
-          </div>
-          <span className="font-bold">{totalUsers.toLocaleString()}</span>
-          <span className="text-sm text-[var(--color-text-sub)]">Всего пользователей</span>
         </div>
 
         {/* Invite Button */}
@@ -251,50 +237,6 @@ export default function Friends() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Steps Instructions */}
-      <section className="space-y-4">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="card-surface p-4"
-        >
-          <div className="flex items-start gap-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-red)] text-lg font-bold text-white">
-              1
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold">Пригласите первого партнёра</p>
-              <span className="inline-block mt-1 rounded-full bg-[var(--color-primary)]/20 px-2 py-0.5 text-xs text-[var(--color-primary)]">
-                Ожидается
-              </span>
-              <p className="mt-2 text-sm text-[var(--color-text-sub)]">
-                Приглашайте друзей по реферальной ссылке
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Referral Program Rules */}
-      <section className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Award className="h-4 w-4 text-[var(--color-primary)]" />
-          <p className="text-sm font-semibold">Правила реферальной программы</p>
-        </div>
-
-        <div className="card-surface p-4 space-y-3">
-          <p className="text-sm text-[var(--color-text-sub)]">
-            Приглашайте партнеров по уникальной ссылке
-          </p>
-          <p className="text-sm text-[var(--color-text-sub)]">
-            После активации их депозита в стейкинге вы получите <span className="text-[var(--color-primary)] font-bold">31%</span> от суммы на ваш баланс
-          </p>
-          <p className="text-sm text-[var(--color-text-sub)]">
-            Начисления происходят автоматически
-          </p>
         </div>
       </section>
 
