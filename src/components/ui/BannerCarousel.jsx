@@ -197,20 +197,6 @@ export default function BannerCarousel() {
             </div>
           </motion.div>
         </AnimatePresence>
-
-        {/* Navigation arrows */}
-        <button
-          onClick={() => paginate(-1)}
-          className="absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm transition-all hover:bg-black/50"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <button
-          onClick={() => paginate(1)}
-          className="absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm transition-all hover:bg-black/50"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
       </div>
 
       {/* Dots */}
