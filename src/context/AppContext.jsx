@@ -54,6 +54,12 @@ export function AppProvider({ children }) {
     }
 
     try {
+      tg.disableVerticalSwipes?.()
+    } catch (e) {
+      // ignore
+    }
+
+    try {
       tg.requestFullscreen?.()
     } catch (e) {
       // ignore
