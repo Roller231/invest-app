@@ -4,7 +4,7 @@ import CryptoIcons from './CryptoIcons'
 
 export default function SupportSection({ showTransferButton = true }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center gap-2 text-lg font-semibold">
         <span className="text-[var(--color-primary)]">BINANCE</span>
       </div>
@@ -45,7 +45,7 @@ export default function SupportSection({ showTransferButton = true }) {
         </LiquidGlassButton>
       </motion.div>
 
-      <div className="card-surface p-3">
+      <div className="p-1.5">
         <CryptoIcons />
       </div>
 

@@ -47,7 +47,7 @@ function IconCircle({ src, alt, index, imgClassName = '' }) {
       initial={{ opacity: 0, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: index * 0.06 }}
-      className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white"
+      className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-white"
       title={alt}
     >
       <img
@@ -66,7 +66,7 @@ function TextCircle({ label, title, index }) {
       initial={{ opacity: 0, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: index * 0.06 }}
-      className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white text-[10px] font-semibold text-[var(--color-text)]"
+      className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-white text-[8px] font-semibold text-[var(--color-text)]"
       title={title}
     >
       {label}
@@ -80,7 +80,7 @@ function PlusCircle({ value = '+10', delay = 0.4 }) {
       initial={{ opacity: 0, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay }}
-      className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-bg-card)] text-[10px] font-semibold text-[var(--color-text-sub)]"
+      className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-bg-card)] text-[8px] font-semibold text-[var(--color-text-sub)]"
     >
       {value}
     </motion.div>
@@ -89,18 +89,18 @@ function PlusCircle({ value = '+10', delay = 0.4 }) {
 
 export default function CryptoIcons() {
   return (
-    <div className="grid grid-cols-2 gap-4">
-      <div className="space-y-2">
-        <div className="text-[11px] font-semibold text-[var(--color-text-sub)]">Принимаем платежи:</div>
+    <div className="grid grid-cols-2 gap-2">
+      <div className="space-y-1">
+        <div className="text-[9px] font-semibold text-[var(--color-text-sub)]">Принимаем платежи:</div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {paymentIcons.map((item, index) => (
             <IconCircle key={item.id} src={item.src} alt={item.name} index={index} />
           ))}
           <PlusCircle value="+10" delay={0.25} />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {bankIcons.map((item, index) => (
             <IconCircle
               key={item.id}
@@ -114,10 +114,12 @@ export default function CryptoIcons() {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <div className="text-[11px] font-semibold text-[var(--color-text-sub)]">Работаем с:</div>
+      <div className="flex flex-col items-end space-y-1">
+        <div className="self-end text-right text-[9px] font-semibold text-[var(--color-text-sub)]">
+          Работаем с:
+        </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-1">
           {exchangeIcons.map((item, index) => (
             <IconCircle
               key={item.id}
@@ -130,7 +132,7 @@ export default function CryptoIcons() {
           <PlusCircle value="+3" delay={0.25} />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-1">
           {aiChatIcons.map((item, index) => (
             item.src ? (
               <IconCircle
