@@ -46,11 +46,11 @@ function FloatingParticles({ count = 50 }) {
 
   return (
     <>
-      <pointLight ref={light} distance={40} intensity={8} color="#FCD535" />
+      <pointLight ref={light} distance={40} intensity={7} color="#22D3EE" />
       <ambientLight intensity={0.1} />
       <instancedMesh ref={mesh} args={[null, null, count]}>
         <dodecahedronGeometry args={[2, 0]} />
-        <meshStandardMaterial color="#FCD535" transparent opacity={0.15} />
+        <meshStandardMaterial color="#22D3EE" transparent opacity={0.12} />
       </instancedMesh>
     </>
   )
@@ -70,9 +70,9 @@ function GlowingSphere() {
     <mesh ref={meshRef} position={[0, 0, -500]}>
       <sphereGeometry args={[100, 32, 32]} />
       <meshStandardMaterial
-        color="#FCD535"
-        emissive="#FCD535"
-        emissiveIntensity={0.2}
+        color="#22D3EE"
+        emissive="#22D3EE"
+        emissiveIntensity={0.16}
         transparent
         opacity={0.1}
       />

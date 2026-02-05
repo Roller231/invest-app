@@ -16,9 +16,9 @@ import { useApp } from '../context/AppContext'
 import { useTranslation } from '../i18n'
 
 const tariffs = [
-  { id: 'okx', name: 'OKX', apy: 3.2, min: 100, max: 10000, color: '#FCD535' },
-  { id: 'bybit', name: 'Bybit', apy: 4.2, min: 10000, max: 100000, color: '#F7A600' },
-  { id: 'binance', name: 'Binance', apy: 5.2, min: 100000, max: 5000000, color: '#FCD535' },
+  { id: 'okx', name: 'OKX', apy: 3.2, min: 100, max: 10000, color: '#22D3EE' },
+  { id: 'bybit', name: 'Bybit', apy: 4.2, min: 10000, max: 100000, color: '#38BDF8' },
+  { id: 'binance', name: 'Binance', apy: 5.2, min: 100000, max: 5000000, color: '#22D3EE' },
 ]
 
 export default function Wallet({ onAvatarClick }) {

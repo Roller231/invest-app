@@ -395,7 +395,7 @@ export default function Profile({ onAvatarClick }) {
                 </div>
                 <div 
                   className="rounded-full px-4 py-2 text-lg font-bold"
-                  style={{ backgroundColor: (currentTariff?.color || '#FCD535') + '20', color: currentTariff?.color || '#FCD535' }}
+                  style={{ backgroundColor: (currentTariff?.color || 'var(--color-primary)') + '20', color: currentTariff?.color || 'var(--color-primary)' }}
                 >
                   +{currentTariff?.daily_percent || 0}%
                 </div>
@@ -422,7 +422,7 @@ export default function Profile({ onAvatarClick }) {
                 </div>
                 <div 
                   className="rounded-full px-4 py-2 text-lg font-bold"
-                  style={{ backgroundColor: (nextTariff?.color || '#FCD535') + '20', color: nextTariff?.color || '#FCD535' }}
+                  style={{ backgroundColor: (nextTariff?.color || 'var(--color-primary)') + '20', color: nextTariff?.color || 'var(--color-primary)' }}
                 >
                   +{nextTariff?.daily_percent || 0}%
                 </div>

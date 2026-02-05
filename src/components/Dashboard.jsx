@@ -18,9 +18,9 @@ import { useToast } from './ui/ToastProvider.jsx'
 import { useTranslation } from '../i18n'
 
 const toneStyles = {
-  neutral: 'border border-white/10',
-  accent: 'border border-[var(--color-primary)]/50',
-  primary: 'border border-[var(--color-primary)] bg-gradient-to-br from-[#2B3139] to-[#1E2329]',
+  neutral: 'border border-white/10 bg-white/[0.02]',
+  accent: 'border border-[var(--color-primary)]/40 bg-[rgba(34,211,238,0.05)]',
+  primary: 'border border-[var(--color-primary)]/35 bg-[rgba(34,211,238,0.04)]',
 }
 
 export default function Dashboard({ onAvatarClick }) {

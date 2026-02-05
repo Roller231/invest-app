@@ -19,10 +19,10 @@ export default function LiquidButton({
 
   const variants = {
     primary: {
-      color: '#FCD535',
-      emissive: '#FCD535',
-      textClass: 'text-[#1E2329]',
-      bgClass: 'bg-[#FCD535]',
+      color: '#22D3EE',
+      emissive: '#22D3EE',
+      textClass: 'text-[#021018]',
+      bgClass: 'bg-[#22D3EE]',
     },
     secondary: {
       color: '#ffffff',

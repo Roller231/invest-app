@@ -56,10 +56,10 @@ export default function RatesWidget({ items = [] }) {
   if (!normalized.length) return null
 
   return (
-    <div className="space-y-2 bg-[#191a1f]">
+    <div className="space-y-2">
       <div
         ref={scrollerRef}
-        className="flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth bg-[#191a1f] rounded-3xl overflow-hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-3xl overflow-hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {normalized.map((asset, idx) => {
           const ticker = asset.symbol || asset.ticker || asset.id || ''
@@ -72,9 +72,13 @@ export default function RatesWidget({ items = [] }) {
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.03 }}
-                className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#2a3139] p-4"
+                className="relative overflow-hidden rounded-3xl border p-4"
                 style={{
-                  boxShadow: '0 10px 26px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)',
+                  background:
+                    'linear-gradient(180deg, rgba(15, 24, 41, 0.96) 0%, rgba(7, 11, 20, 0.92) 100%)',
+                  borderColor: 'rgba(34, 211, 238, 0.16)',
+                  boxShadow:
+                    '0 14px 34px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 18px rgba(34, 211, 238, 0.08)',
                 }}
               >
                 <div
@@ -99,14 +103,14 @@ export default function RatesWidget({ items = [] }) {
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <div className="truncate text-lg font-semibold text-white">{title}</div>
+                      <div className="truncate text-lg font-semibold text-[var(--color-text-main)]">{title}</div>
                       <div className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs font-semibold text-white/80">
                         {ticker}
                       </div>
                     </div>
 
                     <div className="mt-1 flex items-center gap-3">
-                      <div className="text-xl font-bold text-white">
+                      <div className="text-xl font-bold text-[var(--color-text-main)]">
                         {formatAmount(asset.price, { maximumFractionDigits: 2, minimumFractionDigits: 0 })}
                       </div>
 
@@ -121,7 +125,7 @@ export default function RatesWidget({ items = [] }) {
                       </div>
                     </div>
 
-                    <div className="mt-1 text-sm text-white/45">{t('rates.change24h')}</div>
+                    <div className="mt-1 text-sm text-[var(--color-text-sub)]">{t('rates.change24h')}</div>
                   </div>
                 </div>
               </motion.div>
