@@ -52,10 +52,10 @@ export default function RatesWidget({ items = [] }) {
   if (!normalized.length) return null
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 bg-[#191a1f]">
       <div
         ref={scrollerRef}
-        className="flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth bg-[#191a1f] rounded-3xl overflow-hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {normalized.map((asset, idx) => {
           const ticker = asset.symbol || asset.ticker || asset.id || ''
@@ -63,12 +63,12 @@ export default function RatesWidget({ items = [] }) {
           const isUp = asset.isUp
 
           return (
-            <div key={asset.id || `${ticker}-${idx}`} className="w-full shrink-0 snap-center pr-2 last:pr-0">
+            <div key={asset.id || `${ticker}-${idx}`} className="w-full shrink-0 snap-center">
               <motion.div
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.03 }}
-                className="relative overflow-hidden rounded-3xl border border-white/10 bg-[rgba(12,12,14,0.92)] p-4"
+                className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#2a3139] p-4"
                 style={{
                   boxShadow: '0 10px 26px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)',
                 }}

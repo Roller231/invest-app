@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
+:root {
+  --color-bg-base: #191a1f;
+  --color-bg-card: #2a3139;
+}
+
 @theme {
-  --color-bg-base: #000000;
-  --color-bg-card: rgba(255, 255, 255, 0.06);
+  --color-bg-base: #191a1f;
+  --color-bg-card: #2a3139;
   --color-primary: #FCD535;
   --color-primary-rgb: 252 213 53;
   --color-primary-text: #1E2329;
@@ -209,7 +214,7 @@
     gap: 8px;
     padding: 9px 16px;
     border-radius: 9999px;
-    background: rgba(18, 18, 22, 0.55);
+    background: rgba(42, 49, 57, 0.88);
     backdrop-filter: blur(18px) saturate(170%);
     -webkit-backdrop-filter: blur(18px) saturate(170%);
     border: 1px solid rgba(255, 255, 255, 0.10);

@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { createPortal } from 'react-dom'
 
-export default function Modal({ isOpen, onClose, title, children, fullScreen = false, className = '' }) {
+export default function Modal({ isOpen, onClose, title, children, fullScreen = false, topOffset = 0, className = '' }) {
   return createPortal(
     <AnimatePresence>
       {isOpen && (
@@ -21,12 +21,17 @@ export default function Modal({ isOpen, onClose, title, children, fullScreen = f
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={
               fullScreen
-                ? `fixed inset-0 z-[9999] mx-auto max-w-none rounded-none bg-[var(--color-bg-card)] ${className}`
+                ? `fixed inset-x-0 z-[9999] mx-auto max-w-none rounded-none bg-[var(--color-bg-card)] ${className}`
                 : `fixed inset-x-4 bottom-0 z-[9999] mx-auto max-w-md rounded-t-3xl bg-[var(--color-bg-card)] ${className}`
             }
             style={
               fullScreen
-                ? { height: '100dvh', overflow: 'hidden' }
+                ? {
+                    top: topOffset,
+                    bottom: 0,
+                    height: `calc(100dvh - ${topOffset}px)`,
+                    overflow: 'hidden',
+                  }
                 : { maxHeight: '90dvh', overflow: 'hidden' }
             }
           >
