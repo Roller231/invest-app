@@ -68,7 +68,7 @@ export default function Header({
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={toggleCurrency}
-            className="flex h-10 items-center justify-center rounded-full bg-[var(--color-bg-card)] px-3 text-xs font-semibold text-[var(--color-text-main)] ring-1 ring-white/10"
+            className="balance-glass-badge flex h-10 w-10 items-center justify-center p-0 text-xs font-semibold"
           >
             {currency === 'USD' ? '$' : '₽'}
           </motion.button>
