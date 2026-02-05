@@ -95,201 +95,160 @@ export default function Profile() {
         balance={user?.balance || 0}
         avatarUrl={user?.avatar_url}
         avatarName={user?.first_name || user?.username || 'U'}
-        onDeposit={() => setShowDepositModal(true)}
       />
 
-      {/* Active Deposit Card - only show if there's an active deposit */}
-      {deposit > 0 && (
-        <motion.section 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="card-surface overflow-hidden"
-        >
-          <div className="bg-gradient-to-br from-[var(--color-primary)]/20 via-transparent to-transparent p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-sm text-[var(--color-text-sub)]">Активный вклад</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span 
-                    className="text-xs px-2 py-0.5 rounded-full"
-                    style={{
-                      backgroundColor: currentTariff?.color ? currentTariff.color + '20' : 'var(--color-primary)/20',
-                      color: currentTariff?.color || 'var(--color-primary)'
-                    }}
-                  >
-                    {currentTariff?.name || 'Нет тарифа'}
-                  </span>
-                  <span className="text-xs text-[var(--color-green)]">
-                    +{currentTariff?.daily_percent || 0}% в день
-                  </span>
-                </div>
-              </div>
-              <Wallet className="h-6 w-6 text-[var(--color-primary)]" />
-            </div>
-
-            <motion.p 
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              className="text-3xl font-bold"
-            >
-              {deposit.toLocaleString()} ₽
-            </motion.p>
-
-            {/* Timer - show only if active deposit exists */}
-            {stats?.time_to_next_payout > 0 && (
-              <div className="mt-4 flex items-center gap-3">
-                <Timer className="h-4 w-4 text-[var(--color-text-sub)]" />
-                <span className="text-sm text-[var(--color-text-sub)]">До начисления:</span>
-                <div className="flex gap-1 font-mono text-lg">
-                  <span className="rounded bg-[var(--color-bg-base)] px-2 py-1">
-                    {formatTime(timeLeft.hours)}
-                  </span>
-                  <span>:</span>
-                  <span className="rounded bg-[var(--color-bg-base)] px-2 py-1">
-                    {formatTime(timeLeft.minutes)}
-                  </span>
-                  <span>:</span>
-                  <span className="rounded bg-[var(--color-bg-base)] px-2 py-1">
-                    {formatTime(timeLeft.seconds)}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* Stats */}
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <div className="rounded-2xl bg-[var(--color-bg-base)] p-3">
-                <p className="text-xs text-[var(--color-text-sub)]">Накоплено</p>
-                <p className="text-lg font-bold text-[var(--color-primary)]">
-                  {accumulated.toLocaleString()} ₽
-                </p>
-              </div>
-              <div className="rounded-2xl bg-[var(--color-bg-base)] p-3">
-                <p className="text-xs text-[var(--color-text-sub)]">Всего заработано</p>
-                <p className="text-lg font-bold text-[var(--color-green)]">
-                  +{profit.toLocaleString()} ₽
-                </p>
+      <motion.section 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="card-surface overflow-hidden"
+      >
+        <div className="bg-gradient-to-br from-[var(--color-primary)]/20 via-transparent to-transparent p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-sm text-[var(--color-text-sub)]">Активный вклад</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span 
+                  className="text-xs px-2 py-0.5 rounded-full"
+                  style={{
+                    backgroundColor: currentTariff?.color ? currentTariff.color + '20' : 'var(--color-primary)/20',
+                    color: currentTariff?.color || 'var(--color-primary)'
+                  }}
+                >
+                  {currentTariff?.name || 'Нет тарифа'}
+                </span>
+                <span className="text-xs text-[var(--color-green)]">
+                  +{currentTariff?.daily_percent || 0}% в день
+                </span>
               </div>
             </div>
+            <Wallet className="h-6 w-6 text-[var(--color-primary)]" />
           </div>
 
-          {/* Action Buttons */}
-          <div className="p-4 space-y-3">
-            {/* Reinvest & Collect - enabled only when accumulated > 0 */}
-            <div className="flex gap-3">
-              <LiquidGlassButton
-                variant="primary"
-                fullWidth
-                icon={RefreshCw}
-                disabled={loading || accumulated <= 0}
-                onClick={async () => {
-                  setLoading(true)
-                  try {
-                    const result = await reinvest()
-                    toast.success(`Новый вклад: ${result.new_deposit_amount?.toLocaleString()}₽`, 'Реинвест выполнен')
-                  } catch (e) {
-                    toast.error(e.message, 'Ошибка')
-                  } finally {
-                    setLoading(false)
-                  }
-                }}
-              >
-                Реинвест
-              </LiquidGlassButton>
-              <LiquidGlassButton
-                variant="success"
-                fullWidth
-                icon={Download}
-                disabled={loading || accumulated <= 0}
-                onClick={async () => {
-                  setLoading(true)
-                  try {
-                    const result = await collectAccumulated()
-                    toast.success(`+${result.collected.toFixed(2)}₽`, 'Переведено на баланс')
-                  } catch (e) {
-                    toast.error(e.message, 'Ошибка')
-                  } finally {
-                    setLoading(false)
-                  }
-                }}
-              >
-                Собрать
-              </LiquidGlassButton>
-            </div>
+          <motion.p 
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            className="text-3xl font-bold"
+          >
+            {deposit.toLocaleString()} ₽
+          </motion.p>
 
-            {/* Auto Reinvest Toggle */}
-            <motion.button
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              onClick={async () => {
-                try {
-                  await toggleAutoReinvest()
-                } catch (e) {
-                  toast.error(e.message, 'Ошибка')
-                }
-              }}
-              className="flex w-full items-center justify-between rounded-2xl bg-[var(--color-bg-base)] p-4"
-            >
-              <div className="flex items-center gap-3">
-                <RefreshCw className={`h-5 w-5 ${user?.auto_reinvest ? 'text-[var(--color-green)]' : 'text-[var(--color-text-sub)]'}`} />
-                <div>
-                  <span className="font-medium">Авто реинвест</span>
-                  <p className="text-xs text-[var(--color-text-sub)]">Автоматически каждые 24ч</p>
-                </div>
+          {deposit > 0 && stats?.time_to_next_payout > 0 && (
+            <div className="mt-4 flex items-center gap-3">
+              <Timer className="h-4 w-4 text-[var(--color-text-sub)]" />
+              <span className="text-sm text-[var(--color-text-sub)]">До начисления:</span>
+              <div className="flex gap-1 font-mono text-lg">
+                <span className="rounded bg-[var(--color-bg-base)] px-2 py-1">
+                  {formatTime(timeLeft.hours)}
+                </span>
+                <span>:</span>
+                <span className="rounded bg-[var(--color-bg-base)] px-2 py-1">
+                  {formatTime(timeLeft.minutes)}
+                </span>
+                <span>:</span>
+                <span className="rounded bg-[var(--color-bg-base)] px-2 py-1">
+                  {formatTime(timeLeft.seconds)}
+                </span>
               </div>
-              {user?.auto_reinvest ? (
-                <ToggleRight className="h-6 w-6 text-[var(--color-green)]" />
-              ) : (
-                <ToggleLeft className="h-6 w-6 text-[var(--color-text-sub)]" />
-              )}
-            </motion.button>
+            </div>
+          )}
 
-            <LiquidGlassButton
-              variant="secondary"
-              fullWidth
-              onClick={() => setShowWithdrawDepositModal(true)}
-            >
-              Вывести вклад
-            </LiquidGlassButton>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="rounded-2xl bg-[var(--color-bg-base)] p-3">
+              <p className="text-xs text-[var(--color-text-sub)]">Накоплено</p>
+              <p className="text-lg font-bold text-[var(--color-primary)]">
+                {accumulated.toLocaleString()} ₽
+              </p>
+            </div>
+            <div className="rounded-2xl bg-[var(--color-bg-base)] p-3">
+              <p className="text-xs text-[var(--color-text-sub)]">Всего заработано</p>
+              <p className="text-lg font-bold text-[var(--color-green)]">
+                +{profit.toLocaleString()} ₽
+              </p>
+            </div>
+          </div>
+        </div>
 
+        <div className="p-4 space-y-3">
+          <div className="flex gap-3">
             <LiquidGlassButton
               variant="primary"
               fullWidth
-              size="lg"
-              icon={TrendingUp}
-              onClick={() => setShowDepositModal(true)}
+              icon={RefreshCw}
+              disabled={loading || accumulated <= 0 || deposit <= 0}
+              onClick={async () => {
+                setLoading(true)
+                try {
+                  const result = await reinvest()
+                  toast.success(`Новый вклад: ${result.new_deposit_amount?.toLocaleString()}₽`, 'Реинвест выполнен')
+                } catch (e) {
+                  toast.error(e.message, 'Ошибка')
+                } finally {
+                  setLoading(false)
+                }
+              }}
             >
-              Инвестировать
+              Реинвест
             </LiquidGlassButton>
-
-            {/* Trading Terminal Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setShowTradingModal(true)}
-              className="w-full flex items-center justify-between rounded-2xl bg-gradient-to-r from-[var(--color-primary)]/20 to-[var(--color-green)]/20 p-4 border border-white/10"
+            <LiquidGlassButton
+              variant="success"
+              fullWidth
+              icon={Download}
+              disabled={loading || accumulated <= 0 || deposit <= 0}
+              onClick={async () => {
+                setLoading(true)
+                try {
+                  const result = await collectAccumulated()
+                  toast.success(`+${result.collected.toFixed(2)}₽`, 'Переведено на баланс')
+                } catch (e) {
+                  toast.error(e.message, 'Ошибка')
+                } finally {
+                  setLoading(false)
+                }
+              }}
             >
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)]/20">
-                  <Play className="h-5 w-5 text-[var(--color-primary)]" />
-                </div>
-                <div className="text-left">
-                  <p className="font-semibold text-sm">Торговый терминал</p>
-                  <p className="text-xs text-[var(--color-text-sub)]">Смотреть процесс торговли</p>
-                </div>
-              </div>
-              <ChevronRight className="h-5 w-5 text-[var(--color-text-sub)]" />
-            </motion.button>
+              Собрать
+            </LiquidGlassButton>
           </div>
-        </motion.section>
-      )}
 
-      {/* No active deposit */}
-      {deposit <= 0 && (
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+          <motion.button
+            whileHover={deposit > 0 ? { scale: 1.01 } : {}}
+            whileTap={deposit > 0 ? { scale: 0.99 } : {}}
+            onClick={async () => {
+              if (deposit <= 0) return
+              try {
+                await toggleAutoReinvest()
+              } catch (e) {
+                toast.error(e.message, 'Ошибка')
+              }
+            }}
+            className={`flex w-full items-center justify-between rounded-2xl bg-[var(--color-bg-base)] p-4 ${deposit <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <div className="flex items-center gap-3">
+              <RefreshCw className={`h-5 w-5 ${user?.auto_reinvest ? 'text-[var(--color-green)]' : 'text-[var(--color-text-sub)]'}`} />
+              <div>
+                <span className="font-medium">Авто реинвест</span>
+                <p className="text-xs text-[var(--color-text-sub)]">Автоматически каждые 24ч</p>
+              </div>
+            </div>
+            {user?.auto_reinvest ? (
+              <ToggleRight className="h-6 w-6 text-[var(--color-green)]" />
+            ) : (
+              <ToggleLeft className="h-6 w-6 text-[var(--color-text-sub)]" />
+            )}
+          </motion.button>
+
+          <LiquidGlassButton
+            variant="secondary"
+            fullWidth
+            disabled={deposit <= 0}
+            onClick={() => {
+              if (deposit <= 0) return
+              setShowWithdrawDepositModal(true)
+            }}
+          >
+            Вывести вклад
+          </LiquidGlassButton>
+
           <LiquidGlassButton
             variant="primary"
             fullWidth
@@ -299,8 +258,30 @@ export default function Profile() {
           >
             Инвестировать
           </LiquidGlassButton>
-        </motion.section>
-      )}
+
+          <motion.button
+            whileHover={deposit > 0 ? { scale: 1.02 } : {}}
+            whileTap={deposit > 0 ? { scale: 0.98 } : {}}
+            onClick={() => {
+              if (deposit <= 0) return
+              setShowTradingModal(true)
+            }}
+            disabled={deposit <= 0}
+            className={`w-full flex items-center justify-between rounded-2xl bg-gradient-to-r from-[var(--color-primary)]/20 to-[var(--color-green)]/20 p-4 border border-white/10 ${deposit <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)]/20">
+                <Play className="h-5 w-5 text-[var(--color-primary)]" />
+              </div>
+              <div className="text-left">
+                <p className="font-semibold text-sm">Торговый терминал</p>
+                <p className="text-xs text-[var(--color-text-sub)]">Смотреть процесс торговли</p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-[var(--color-text-sub)]" />
+          </motion.button>
+        </div>
+      </motion.section>
 
       {/* Tariff Plans */}
       <section className="space-y-4">
@@ -413,19 +394,10 @@ export default function Profile() {
 
         <div className="grid grid-cols-2 gap-3">
           {marketTrends.slice(0, 6).map((asset, index) => {
-            // Generate smooth line chart data
-            const chartPoints = asset.chartData || Array.from({ length: 20 }, (_, i) => {
-              const base = 50
-              const trend = asset.trend === 'up' ? i * 1.5 : -i * 1.2
-              const noise = (Math.sin(i * 0.8) * 15) + (Math.random() - 0.5) * 10
-              return Math.max(5, Math.min(95, base + trend + noise))
-            })
-            const pathD = chartPoints.map((y, i) => {
-              const x = (i / (chartPoints.length - 1)) * 100
-              return `${i === 0 ? 'M' : 'L'} ${x} ${100 - y}`
-            }).join(' ')
             const isUp = asset.trend === 'up'
             const lineColor = isUp ? 'var(--color-green)' : 'var(--color-red)'
+            // Static chart path - same for all cards (matches reference: sharp rise, jagged peaks, then drop + flatter tail)
+            const staticPath = 'M 0 52 L 6 40 L 12 34 L 18 38 L 24 30 L 30 44 L 36 26 L 42 34 L 48 48 L 54 42 L 60 50 L 66 46 L 72 52 L 78 49 L 84 53 L 90 51 L 96 54 L 100 53'
             
             return (
               <motion.div
@@ -433,34 +405,21 @@ export default function Profile() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="card-surface p-3 relative overflow-hidden"
+                className="relative overflow-hidden rounded-2xl p-3"
+                style={{
+                  background: 'linear-gradient(145deg, rgba(20, 20, 24, 0.95) 0%, rgba(12, 12, 14, 0.98) 100%)',
+                  border: `1px solid ${lineColor}`,
+                  boxShadow: `inset 0 1px 0 rgba(255,255,255,0.04), 0 0 20px ${isUp ? 'rgba(14, 203, 129, 0.15)' : 'rgba(246, 70, 93, 0.15)'}, 0 4px 16px rgba(0,0,0,0.25)`
+                }}
               >
-                {/* Background gradient based on trend */}
-                <div 
-                  className="absolute inset-0 opacity-10"
-                  style={{
-                    background: `linear-gradient(180deg, ${isUp ? 'var(--color-green)' : 'var(--color-red)'} 0%, transparent 100%)`
-                  }}
-                />
-                
-                {/* Line Chart SVG */}
-                <div className="absolute inset-x-0 top-3 h-16 opacity-60">
-                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
-                    <defs>
-                      <linearGradient id={`gradient-${asset.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor={lineColor} stopOpacity="0.3" />
-                        <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
-                      </linearGradient>
-                    </defs>
+                {/* Static Line Chart SVG - same shape for all */}
+                <div className="trend-chart absolute top-0 right-3 w-[58%] h-[56%]">
+                  <svg viewBox="0 0 100 70" preserveAspectRatio="none" className="w-full h-full">
                     <path
-                      d={`${pathD} L 100 100 L 0 100 Z`}
-                      fill={`url(#gradient-${asset.id})`}
-                    />
-                    <path
-                      d={pathD}
+                      d={staticPath}
                       fill="none"
                       stroke={lineColor}
-                      strokeWidth="2"
+                      className="trend-chart-line"
                       vectorEffect="non-scaling-stroke"
                     />
                   </svg>

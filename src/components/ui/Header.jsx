@@ -22,7 +22,7 @@ export default function Header({
       <motion.header 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="flex items-center justify-between mb-6"
+        className="flex items-center justify-between mb-6 mt-[75px]"
       >
         <div className="flex items-center gap-3">
           {showBack ? (
@@ -56,13 +56,9 @@ export default function Header({
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 rounded-full bg-[var(--color-bg-card)] px-3 py-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-red)] text-xs font-bold text-white">
-              ₽
-            </span>
-            <span className="text-sm font-semibold">
-              {balance.toFixed(2)}
-            </span>
+          <div className="balance-glass-badge">
+            <span className="balance-glass-symbol">₽</span>
+            <span className="balance-glass-value">{balance.toFixed(2)}</span>
           </div>
           
           <motion.button
