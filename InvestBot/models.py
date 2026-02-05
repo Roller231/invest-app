@@ -4,6 +4,12 @@ from sqlalchemy.sql import func
 from database import Base
 
 
+class Tariff(Base):
+    __tablename__ = "tariffs"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+
 class User(Base):
     __tablename__ = "users"
     
