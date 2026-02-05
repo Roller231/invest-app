@@ -7,9 +7,9 @@ class Settings(BaseSettings):
     BOT_TOKEN: str = ""
     DATABASE_URL: str = "mysql+aiomysql://invest:investpass@mysql:3306/invest_app"
     DATABASE_URL_SYNC: str = "mysql+pymysql://invest:investpass@mysql:3306/invest_app"
-    BOT_USERNAME: str = "ggcat_game_bot"
-    WEBAPP_URL: str = "https://fittingtestrt.ru"
-    ADMIN_TG_IDS: str = "414135760"
+    BOT_USERNAME: str = "miniappp_test12312_bot"
+    WEBAPP_URL: str = "https://invest-app-psi.vercel.app/"
+    ADMIN_TG_IDS: str = "1008871802"
 
     @property
     def admin_tg_ids_list(self) -> List[int]:
