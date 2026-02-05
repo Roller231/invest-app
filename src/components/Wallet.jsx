@@ -1,30 +1,47 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { 
   Calculator, 
-  Landmark, 
   ArrowDownToLine,
   ArrowUpFromLine,
   History,
   Info
 } from 'lucide-react'
-import { paymentMethods, cryptoPayments } from '../data.js'
 import Header from './ui/Header'
 import LiquidGlassButton from './ui/LiquidGlassButton'
 import SupportSection from './ui/SupportSection'
 import TopUpModal from './modals/TopUpModal'
 import WithdrawModal from './modals/WithdrawModal'
-import CalculatorModal from './modals/CalculatorModal'
 import { useApp } from '../context/AppContext'
+
+const tariffs = [
+  { id: 'okx', name: 'OKX', apy: 3.2, min: 100, max: 10000, color: '#FCD535' },
+  { id: 'bybit', name: 'Bybit', apy: 4.2, min: 10000, max: 100000, color: '#F7A600' },
+  { id: 'binance', name: 'Binance', apy: 5.2, min: 100000, max: 5000000, color: '#FCD535' },
+]
 
 export default function Wallet() {
   const { user, getUserTransactions } = useApp()
   const [showDepositModal, setShowDepositModal] = useState(false)
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
-  const [showCalculatorModal, setShowCalculatorModal] = useState(false)
   const [activeTab, setActiveTab] = useState('all')
   const [transactionHistory, setTransactionHistory] = useState([])
+  const [selectedTariff, setSelectedTariff] = useState('okx')
+  const [amount, setAmount] = useState('1000')
   const balance = user?.balance || 0
+
+  const tariff = tariffs.find(t => t.id === selectedTariff)
+
+  const calculations = useMemo(() => {
+    const amt = parseFloat(amount) || 0
+    const dailyRate = (tariff?.apy || 0) / 100
+
+    return {
+      daily: amt * dailyRate,
+      monthly: amt * dailyRate * 30,
+      yearly: amt * dailyRate * 365,
+    }
+  }, [amount, tariff])
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -100,13 +117,10 @@ export default function Wallet() {
       </motion.section>
 
       {/* Calculator Button */}
-      <motion.button
+      <motion.section
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={() => setShowCalculatorModal(true)}
-        className="card-surface flex w-full items-center justify-between p-4"
+        className="card-surface p-4"
       >
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)]/20">
@@ -117,39 +131,74 @@ export default function Wallet() {
             <p className="text-xs text-[var(--color-text-sub)]">Рассчитайте доходность</p>
           </div>
         </div>
-        <span className="text-[var(--color-primary)]">→</span>
-      </motion.button>
 
-      {/* Payment Methods */}
-      <motion.section 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="card-surface p-4"
-      >
-        <div className="flex items-center justify-between mb-4">
+        <div className="mt-5 space-y-5">
           <div>
-            <p className="text-sm font-semibold">Платежные решения</p>
-            <p className="text-xs text-sub">Доступные способы оплаты</p>
+            <p className="mb-3 text-sm font-medium text-[var(--color-text-sub)]">
+              Выберите тариф
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {tariffs.map((t) => (
+                <motion.button
+                  key={t.id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setSelectedTariff(t.id)}
+                  className={`flex flex-col items-center gap-1 rounded-2xl border p-3 transition-all ${
+                    selectedTariff === t.id
+                      ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10'
+                      : 'border-white/10 bg-[var(--color-bg-base)]'
+                  }`}
+                >
+                  <span className="text-sm font-bold">{t.name}</span>
+                  <span className="text-xs text-[var(--color-green)]">+{t.apy}%</span>
+                </motion.button>
+              ))}
+            </div>
           </div>
-          <Landmark className="h-6 w-6 text-[var(--color-primary)]" />
-        </div>
-        
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {[...paymentMethods, ...cryptoPayments].map((method, index) => (
-            <motion.div
-              key={method.id}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.05 }}
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-lg"
-              style={{ backgroundColor: method.color + '20' }}
-            >
-              {method.abbr}
-            </motion.div>
-          ))}
+
+          <div>
+            <p className="mb-2 text-sm font-medium text-[var(--color-text-sub)]">
+              Сумма вложения (мин. {tariff?.min?.toLocaleString()} ₽)
+            </p>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              min={tariff?.min}
+              placeholder={tariff?.min ? `От ${tariff.min.toLocaleString()} ₽` : 'Сумма'}
+              className="h-14 w-full rounded-2xl bg-[var(--color-bg-base)] px-4 text-xl font-bold outline-none ring-1 ring-white/10 focus:ring-[var(--color-primary)]"
+            />
+            <p className="mt-2 text-xs text-[var(--color-text-sub)]">
+              Диапазон: {tariff?.min?.toLocaleString()} ₽ — {tariff?.max?.toLocaleString()} ₽
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-[var(--color-text-sub)]">Ваш доход</p>
+
+            <div className="flex items-center justify-between rounded-2xl bg-[var(--color-bg-base)] p-4">
+              <span className="text-sm text-[var(--color-text-sub)]">За 24 часа</span>
+              <span className="text-lg font-bold text-[var(--color-green)]">+{calculations.daily.toFixed(2)} ₽</span>
+            </div>
+
+            <div className="flex items-center justify-between rounded-2xl bg-[var(--color-bg-base)] p-4">
+              <span className="text-sm text-[var(--color-text-sub)]">За месяц</span>
+              <span className="text-lg font-bold text-[var(--color-primary)]">+{calculations.monthly.toFixed(2)} ₽</span>
+            </div>
+
+            <div className="flex items-center justify-between rounded-2xl bg-gradient-to-r from-[var(--color-primary)]/20 to-transparent p-4">
+              <span className="text-sm font-medium">За год</span>
+              <span className="text-xl font-bold text-[var(--color-primary)]">
+                +{calculations.yearly.toLocaleString(undefined, { maximumFractionDigits: 0 })} ₽
+              </span>
+            </div>
+          </div>
         </div>
       </motion.section>
+
+      {/* Payment Methods */}
+      {null}
 
       {/* Deposit Info Banner */}
       <motion.div
@@ -258,10 +307,6 @@ export default function Wallet() {
         isOpen={showWithdrawModal} 
         onClose={() => setShowWithdrawModal(false)}
         balance={balance}
-      />
-      <CalculatorModal 
-        isOpen={showCalculatorModal} 
-        onClose={() => setShowCalculatorModal(false)} 
       />
     </div>
   )

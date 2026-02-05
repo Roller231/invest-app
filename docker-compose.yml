@@ -48,6 +48,27 @@ services:
     networks:
       - invest_net
 
+  bot:
+    build:
+      context: ./InvestBot
+      dockerfile: Dockerfile
+    container_name: invest-bot
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    environment:
+      BOT_TOKEN: "7515984360:AAGcx9pR2npFeFbOZElePlNGh-XebBNFP9Q"
+      DATABASE_URL: mysql+aiomysql://invest:investpass@mysql:3306/invest_app
+      DATABASE_URL_SYNC: mysql+pymysql://invest:investpass@mysql:3306/invest_app
+      BOT_USERNAME: ggcat_game_bot
+      WEBAPP_URL: https://fittingtestrt.ru
+      ADMIN_TG_IDS: "414135760"
+    networks:
+      - invest_net
+
 volumes:
   mysql_data:
 
