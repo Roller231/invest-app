@@ -45,7 +45,9 @@ export default function SupportSection({ showTransferButton = true }) {
         </LiquidGlassButton>
       </motion.div>
 
-      <CryptoIcons />
+      <div className="card-surface p-3">
+        <CryptoIcons />
+      </div>
 
       <p className="text-center text-xs text-[var(--color-text-sub)]">
         © 2026 BINANCE. Все права защищены.

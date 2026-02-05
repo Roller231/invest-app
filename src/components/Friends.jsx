@@ -20,7 +20,6 @@ export default function Friends() {
   const { user, getReferralStats } = useApp()
   const [copied, setCopied] = useState(false)
   const [refStats, setRefStats] = useState(null)
-  const totalUsers = 61094
 
   useEffect(() => {
     const fetchStats = async () => {
