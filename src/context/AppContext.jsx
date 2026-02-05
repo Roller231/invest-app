@@ -324,13 +324,13 @@ export function AppProvider({ children }) {
             const msg = JSON.parse(evt.data);
             if (msg?.type === 'live_snapshot') {
               // backward compatibility
-              if (Array.isArray(msg.live_transactions)) setLiveTransactions(msg.live_transactions);
+              if (Array.isArray(msg.live_transactions)) setLiveTransactions(msg.live_transactions.slice(0, 5));
               if (Array.isArray(msg.top_strip)) setTopStrip(msg.top_strip);
               return
             }
 
             if (msg?.type === 'live_init') {
-              if (Array.isArray(msg.live_transactions)) setLiveTransactions(msg.live_transactions);
+              if (Array.isArray(msg.live_transactions)) setLiveTransactions(msg.live_transactions.slice(0, 5));
               if (Array.isArray(msg.top_strip)) setTopStrip(msg.top_strip);
               return
             }
@@ -345,7 +345,7 @@ export function AppProvider({ children }) {
                   if (seen.has(t.id)) continue
                   seen.add(t.id)
                   dedup.push(t)
-                  if (dedup.length >= 10) break
+                  if (dedup.length >= 5) break
                 }
                 return dedup
               })
