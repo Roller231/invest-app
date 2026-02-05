@@ -84,14 +84,7 @@ export default function RatesWidget({ items = [] }) {
                   }}
                 />
 
-                <div className="relative flex items-start gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-white/85">
-                      <span className="h-2 w-2 rounded-full bg-[var(--color-primary)]" />
-                      LIVE
-                    </span>
-                  </div>
-                </div>
+
 
                 <div className="relative mt-3 flex items-start gap-4">
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/5">
