@@ -185,18 +185,13 @@ export default function TopUpModal({ isOpen, onClose }) {
                           <p className="font-mono font-bold text-lg">{req.details}</p>
                           <button
                             onClick={() => copyToClipboard(req.details, req.id)}
-                            className="flex items-center gap-1 text-[var(--color-primary)] text-sm"
+                            aria-label={copiedId === req.id ? 'Скопировано' : 'Копировать'}
+                            className="flex items-center justify-center text-[var(--color-primary)]"
                           >
                             {copiedId === req.id ? (
-                              <>
-                                <CheckCircle className="h-4 w-4" />
-                                <span>Скопировано</span>
-                              </>
+                              <CheckCircle className="h-5 w-5" />
                             ) : (
-                              <>
-                                <Copy className="h-4 w-4" />
-                                <span>Копировать</span>
-                              </>
+                              <Copy className="h-5 w-5" />
                             )}
                           </button>
                         </div>
