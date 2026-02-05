@@ -33,6 +33,9 @@ export const endpoints = {
   // Payment Requisites
   paymentRequisites: '/payment-requisites/',
 
+  // Market Rates
+  marketRates: '/market-rates',
+
   // Promo
   promoActivate: (tgId) => `/promo/${tgId}/activate`,
 };

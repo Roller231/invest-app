@@ -17,11 +17,13 @@ import { marketTrends, faqItems } from '../data.js'
 import Header from './ui/Header'
 import LiquidGlassButton from './ui/LiquidGlassButton'
 import SupportSection from './ui/SupportSection'
+import RatesWidget from './ui/RatesWidget'
 import DepositModal from './modals/DepositModal'
 import WithdrawDepositModal from './modals/WithdrawDepositModal'
 import TradingSimulationModal from './modals/TradingSimulationModal'
 import { useApp } from '../context/AppContext'
 import { useToast } from './ui/ToastProvider.jsx'
+import { api } from '../api'
 
 export default function Profile() {
   const { user, stats, tariffs, activeDeposit, toggleAutoReinvest, collectAccumulated, reinvest, withdrawDeposit, refreshUser, processPayouts } = useApp()
@@ -33,6 +35,7 @@ export default function Profile() {
   const [expandedFaq, setExpandedFaq] = useState(null)
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 })
   const [loading, setLoading] = useState(false)
+  const [rates, setRates] = useState([])
   
   const deposit = stats?.total_deposit || 0
   const profit = stats?.total_earned || 0
@@ -86,6 +89,39 @@ export default function Profile() {
     
     return () => clearInterval(timer)
   }, [processPayouts])
+
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        const data = await api.getMarketRates()
+        if (!mounted) return
+        setRates(Array.isArray(data) ? data : [])
+      } catch (e) {
+        if (!mounted) return
+        setRates([])
+      }
+    })()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const ratesWidgetItems = (rates?.length ? rates : marketTrends.slice(0, 6)).map((it) => {
+    const symbol = it?.symbol || it?.ticker || it?.id
+    const fallback = marketTrends.find((m) => m.symbol === symbol || m.id === symbol?.toLowerCase())
+    return {
+      ...fallback,
+      ...it,
+      id: (fallback?.id || it?.id || symbol || '').toString(),
+      symbol: symbol || fallback?.symbol,
+      name: it?.name || fallback?.name,
+      price_rub: it?.price_rub ?? fallback?.price,
+      change_24h: it?.change_24h ?? fallback?.change,
+      trend: it?.trend || fallback?.trend,
+      icon: fallback?.icon || it?.icon,
+    }
+  })
 
   const formatTime = (num) => num.toString().padStart(2, '0')
 
@@ -392,75 +428,7 @@ export default function Profile() {
           <p className="text-sm font-semibold">В тренде</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          {marketTrends.slice(0, 6).map((asset, index) => {
-            const isUp = asset.trend === 'up'
-            const lineColor = isUp ? 'var(--color-green)' : 'var(--color-red)'
-            // Static chart path - same for all cards (matches reference: sharp rise, jagged peaks, then drop + flatter tail)
-            const staticPath = 'M 0 52 L 2 50 L 4 48 L 6 46 L 8 44 L 10 41 L 12 38 L 14 36 L 16 34 L 18 35 L 20 36 L 22 34 L 24 32 L 26 34 L 28 36 L 30 39 L 32 42 L 34 38 L 36 34 L 38 31 L 40 28 L 42 30 L 44 32 L 46 36 L 48 40 L 50 44 L 52 48 L 54 46 L 56 44 L 58 45 L 60 46 L 62 48 L 64 50 L 66 49 L 68 47 L 70 49 L 72 52 L 74 51 L 76 50 L 78 52 L 80 53 L 82 52 L 84 51 L 86 53 L 88 54 L 90 53 L 92 52 L 94 54 L 96 55 L 98 54 L 100 53'
-            
-            return (
-              <motion.div
-                key={asset.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="relative overflow-hidden rounded-2xl p-3"
-                style={{
-                  background: 'linear-gradient(145deg, rgba(20, 20, 24, 0.95) 0%, rgba(12, 12, 14, 0.98) 100%)',
-                  border: `1px solid ${lineColor}`,
-                  boxShadow: `inset 0 1px 0 rgba(255,255,255,0.04), 0 0 20px ${isUp ? 'rgba(14, 203, 129, 0.15)' : 'rgba(246, 70, 93, 0.15)'}, 0 4px 16px rgba(0,0,0,0.25)`
-                }}
-              >
-                {/* Static Line Chart SVG - same shape for all */}
-                <div className="trend-chart absolute top-0 right-3 w-[58%] h-[56%]">
-                  <svg viewBox="0 0 100 70" preserveAspectRatio="none" className="w-full h-full">
-                    <path
-                      d={staticPath}
-                      fill="none"
-                      stroke={lineColor}
-                      className="trend-chart-line"
-                      vectorEffect="non-scaling-stroke"
-                    />
-                  </svg>
-                </div>
-                
-                {/* Content */}
-                <div className="relative z-10">
-                  {/* Crypto Icon */}
-                  <div className="flex items-center gap-2 mb-9">
-                    <img 
-                      src={asset.icon || `https://cryptologos.cc/logos/${asset.name.toLowerCase()}-${asset.symbol.toLowerCase()}-logo.png`}
-                      alt={asset.symbol}
-                      className={`rounded-full ${(asset.id === 'eth' || asset.id === 'sol') ? 'h-9 w-9' : 'h-8 w-8'}`}
-                      onError={(e) => {
-                        e.target.onerror = null
-                        e.target.src = `https://ui-avatars.com/api/?name=${asset.symbol}&background=${asset.color?.replace('#', '')}&color=fff&size=32`
-                      }}
-                    />
-                  </div>
-                  
-                  {/* Name and Change */}
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm font-medium">{asset.name}</p>
-                    <span className={`text-xs px-1.5 py-0.5 rounded ${
-                      isUp 
-                        ? 'bg-[var(--color-green)]/20 text-[var(--color-green)]' 
-                        : 'bg-[var(--color-red)]/20 text-[var(--color-red)]'
-                    }`}>
-                      {isUp ? '↑' : '↓'} {Math.abs(asset.change)}%
-                    </span>
-                  </div>
-                  
-                  {/* Price */}
-                  <p className="text-lg font-bold">
-                    {asset.price.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} ₽
-                  </p>
-                </div>
-              </motion.div>
-            )
-          })}
-        </div>
+        <RatesWidget items={ratesWidgetItems} />
       </section>
 
       {/* FAQ */}

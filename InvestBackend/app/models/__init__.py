@@ -6,6 +6,7 @@ from app.models.referral import Referral
 from app.models.fake_name import FakeName
 from app.models.payment_requisite import PaymentRequisite
 from app.models.promo import PromoCode, PromoRedemption
+from app.models.market_rate import MarketRate
 
 __all__ = [
     "User",
@@ -17,4 +18,5 @@ __all__ = [
     "PaymentRequisite",
     "PromoCode",
     "PromoRedemption",
+    "MarketRate",
 ]

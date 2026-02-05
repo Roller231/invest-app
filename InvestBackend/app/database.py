@@ -55,7 +55,7 @@ def create_database_if_not_exists():
 
 async def init_db():
     """Initialize database and create all tables"""
-    from app.models import User, Tariff, Deposit, Transaction, Referral, FakeName, PromoCode, PromoRedemption
+    from app.models import User, Tariff, Deposit, Transaction, Referral, FakeName, PromoCode, PromoRedemption, MarketRate
 
     # Wait for DB to be reachable (docker / cold start)
     for _ in range(30):
@@ -120,6 +120,21 @@ async def init_db():
             ]
             session.add_all(fake_names)
             
+            await session.commit()
+
+        rates_result = await session.execute(select(MarketRate))
+        rates = rates_result.scalars().all()
+        if not rates:
+            session.add_all(
+                [
+                    MarketRate(symbol="SOL", name="Solana", price_rub=7164.80, change_24h=-6.45, trend="down", sort_order=1),
+                    MarketRate(symbol="BTC", name="Bitcoin", price_rub=5607600.00, change_24h=-7.61, trend="down", sort_order=2),
+                    MarketRate(symbol="BNB", name="BNB", price_rub=54280.00, change_24h=-9.47, trend="down", sort_order=3),
+                    MarketRate(symbol="USDT", name="Tether", price_rub=79.86, change_24h=-0.02, trend="down", sort_order=4),
+                    MarketRate(symbol="ETH", name="Ethereum", price_rub=165297.60, change_24h=-7.70, trend="down", sort_order=5),
+                    MarketRate(symbol="TON", name="Toncoin", price_rub=110.40, change_24h=-0.63, trend="down", sort_order=6),
+                ]
+            )
             await session.commit()
 
         promo_result = await session.execute(select(PromoCode))

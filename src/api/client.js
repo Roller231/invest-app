@@ -141,6 +141,11 @@ class ApiClient {
     return this.request(endpoints.paymentRequisites);
   }
 
+  // Market Rates
+  async getMarketRates() {
+    return this.request(endpoints.marketRates);
+  }
+
   // Promo
   async activatePromo(tgId, code) {
     return this.request(endpoints.promoActivate(tgId), {

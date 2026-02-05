@@ -21,6 +21,7 @@ from app.routers import (
     ws_router,
     payment_requisites_router,
     promo_router,
+    market_rates_router,
 )
 from app.services.payout_service import run_payout_job
 
@@ -92,6 +93,7 @@ app.include_router(admin_router, prefix="/api")
 app.include_router(ws_router, prefix="/api")
 app.include_router(payment_requisites_router, prefix="/api")
 app.include_router(promo_router, prefix="/api")
+app.include_router(market_rates_router, prefix="/api")
 
 setup_admin(app, sync_engine)
 

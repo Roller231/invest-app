@@ -7,6 +7,7 @@ from app.routers.admin import router as admin_router
 from app.routers.ws import router as ws_router
 from app.routers.payment_requisites import router as payment_requisites_router
 from app.routers.promo import router as promo_router
+from app.routers.market_rates import router as market_rates_router
 
 __all__ = [
     "users_router",
@@ -18,4 +19,5 @@ __all__ = [
     "ws_router",
     "payment_requisites_router",
     "promo_router",
+    "market_rates_router",
 ]

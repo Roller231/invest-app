@@ -3,7 +3,7 @@ from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from app.models import User, Tariff, Deposit, Transaction, Referral, FakeName, PaymentRequisite, PromoCode, PromoRedemption
+from app.models import User, Tariff, Deposit, Transaction, Referral, FakeName, PaymentRequisite, PromoCode, PromoRedemption, MarketRate
 from app.config import settings
 
 
@@ -69,6 +69,42 @@ class UserAdmin(ModelView, model=User):
         User.is_banned, User.is_admin
     ]
     
+    can_create = True
+    can_edit = True
+    can_delete = True
+
+
+class MarketRateAdmin(ModelView, model=MarketRate):
+    name = "Курс"
+    name_plural = "Курсы"
+    icon = "fa-solid fa-chart-line"
+
+    column_list = [
+        MarketRate.id,
+        MarketRate.symbol,
+        MarketRate.name,
+        MarketRate.price_rub,
+        MarketRate.change_24h,
+        MarketRate.trend,
+        MarketRate.is_active,
+        MarketRate.sort_order,
+        MarketRate.updated_at,
+    ]
+
+    column_searchable_list = [MarketRate.symbol, MarketRate.name]
+    column_sortable_list = [MarketRate.id, MarketRate.symbol, MarketRate.price_rub, MarketRate.sort_order, MarketRate.updated_at]
+    column_default_sort = [("sort_order", False)]
+
+    form_columns = [
+        MarketRate.symbol,
+        MarketRate.name,
+        MarketRate.price_rub,
+        MarketRate.change_24h,
+        MarketRate.trend,
+        MarketRate.is_active,
+        MarketRate.sort_order,
+    ]
+
     can_create = True
     can_edit = True
     can_delete = True
@@ -369,6 +405,7 @@ def setup_admin(app, engine):
     admin.add_view(ReferralAdmin)
     admin.add_view(FakeNameAdmin)
     admin.add_view(PaymentRequisiteAdmin)
+    admin.add_view(MarketRateAdmin)
     admin.add_view(PromoCodeAdmin)
     admin.add_view(PromoRedemptionAdmin)
     
